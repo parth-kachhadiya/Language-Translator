@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolyGlot Translator</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #7c3aed;
+            --accent-color: #06b6d4;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --sidebar-active: #0f172a;
+            --sidebar-text: #cbd5e1;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --sidebar-width: 260px;
+            --sidebar-collapsed: 70px;
+            --header-height: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: var(--text-primary);
+            height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Parent Layout */
+        .layout-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: white;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-text {
+            transition: opacity 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            margin: 4px 12px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background: var(--sidebar-hover);
+            color: white;
+            transform: translateX(2px);
+        }
+
+        .nav-link.active {
+            background: var(--sidebar-active);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background: var(--accent-color);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .nav-text {
+            transition: opacity 0.3s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .sidebar.collapsed .nav-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        /* Sidebar Toggle */
+        .sidebar-toggle {
+            margin: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar.collapsed~.main-content {
+            margin-left: var(--sidebar-collapsed);
+        }
+
+        /* Header */
+        .main-header {
+            height: var(--header-height);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-profile:hover {
+            background: #e2e8f0;
+        }
+
+        /* Content Area */
+        .content-wrapper {
+            padding: 30px;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        /* Code-Mixed Interface */
+        .mixed-language-interface {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Language Selection */
+        .language-selector-single {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .language-box {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .language-box label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        .language-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .language-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Text Areas */
+        .text-areas {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 992px) {
+            .text-areas {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .text-area-container {
+            position: relative;
+        }
+
+        .text-area-container label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 180px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            background: white;
+            color: var(--text-primary);
+            resize: vertical;
+            transition: all 0.2s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .text-input[readonly] {
+            background: #f8fafc;
+            cursor: not-allowed;
+        }
+
+        .char-count {
+            position: absolute;
+            bottom: 12px;
+            right: 16px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            color: white;
+        }
+
+        .btn-secondary-custom {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary-custom:hover {
+            background: #f1f5f9;
+            border-color: var(--primary-color);
+        }
+
+        /* Server Response Display */
+        .server-response-display {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .response-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .response-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1.1rem;
+        }
+
+        .confidence-badge {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Response Sections */
+        .response-section {
+            margin-bottom: 20px;
+        }
+
+        .response-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        .response-value {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            font-size: 0.95rem;
+            word-break: break-word;
+        }
+
+        .language-detection-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .language-tag-detected {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .language-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .confidence-score {
+            color: var(--success-color);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* Mixed Language Examples */
+        .examples-container {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .examples-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+
+        .example-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .example-item:hover {
+            background: #f8fafc;
+            border-color: var(--primary-color);
+        }
+
+        .example-text {
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .example-label {
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        /* Processing Animation */
+        .processing-animation {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Difficulty Badges */
+        .difficulty-badge {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .difficulty-easy {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .difficulty-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .difficulty-hard {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .feature-card .card-header {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-weight: 600;
+            padding: 16px 20px;
+            border-bottom: none;
+        }
+
+        #translatedOutputText{
+            font-weight: bold;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: var(--sidebar-collapsed);
+            }
+
+            .sidebar:not(.collapsed) {
+                width: var(--sidebar-width);
+            }
+
+            .main-content {
+                margin-left: var(--sidebar-collapsed);
+            }
+
+            .sidebar:not(.collapsed)~.main-content {
+                margin-left: var(--sidebar-width);
+            }
+
+            .content-wrapper {
+                padding: 20px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .language-selector-single {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .language-detection-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Parent Layout -->
+    <div class="layout-container">
+        <!-- Left Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <div class="logo-icon">
+                        <i class="bi bi-translate"></i>
+                    </div>
+                    <span class="logo-text">PolyGlot</span>
+                </a>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">
+                        <i class="bi bi-globe nav-icon"></i>
+                        <span class="nav-text">Translation Core</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="normalization.html" class="nav-link">
+                        <i class="bi bi-input-cursor-text nav-icon"></i>
+                        <span class="nav-text">Input Normalization</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="transliteration.html" class="nav-link">
+                        <i class="bi bi-fonts nav-icon"></i>
+                        <span class="nav-text">Transliteration</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="context.html" class="nav-link">
+                        <i class="bi bi-text-paragraph nav-icon"></i>
+                        <span class="nav-text">Context-Aware</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="tone.html" class="nav-link">
+                        <i class="bi bi-magic nav-icon"></i>
+                        <span class="nav-text">Tone & Style</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-page="code-mixed">
+                        <i class="bi bi-code-slash nav-icon"></i>
+                        <span class="nav-text">Code-Mixed</span>
+                    </a>
+                </li>
+            </ul>
+
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="bi bi-chevron-left" id="toggleIcon"></i>
+            </button>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <h1 class="page-title" id="pageTitle">Code-Mixed Translation</h1>
+                <div class="user-profile">
+                    <span>Welcome, User</span>
+                    <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="content-wrapper" id="pageContent">
+                <!-- Code-Mixed Translation Section -->
+                <div class="section-header">
+                    <div class="section-title">
+                        <div class="section-icon">
+                            <i class="bi bi-code-slash"></i>
+                        </div>
+                        <div>
+                            <h2>Mixed Language Translation</h2>
+                            <p class="text-muted mb-0">Enter any mixed language text (Hinglish, Gujlish, etc.)</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Mixed Language Examples -->
+                <div class="examples-container">
+                    <div class="examples-title">
+                        <i class="bi bi-lightbulb"></i>
+                        Try These Mixed Language Examples
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <div class="example-item" data-example="1">
+                                <div class="example-label">Gujlish (Gujarati + English)</div>
+                                <div class="example-text">"I will be there for the meeting."</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div class="example-item" data-example="2">
+                                <div class="example-label">Hinglish (Hindi + English)</div>
+                                <div class="example-text">"Kal meeting important hai, please attend karna."</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div class="example-item" data-example="3">
+                                <div class="example-label">Benglish (Bengali + English)</div>
+                                <div class="example-text">"Aaj office e busy achhi, call korbe na?"</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mixed-language-interface">
+                    <!-- Target Language Selection Only -->
+                    <div class="language-selector-single">
+                        <div class="language-box">
+                            <label for="targetLang">
+                                <i class="bi bi-translate me-1"></i>
+                                Select Target Language
+                            </label>
+                            <select class="language-select" id="targetLang">
+                                <option value="hi" selected>Hindi (हिंदी)</option>
+                                <option value="en">English</option>
+                                <option value="gu">Gujarati (ગુજરાતી)</option>
+                                <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+                                <option value="mr">Marathi (मराठी)</option>
+                                <option value="bn">Bengali (বাংলা)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Text Areas -->
+                    <div class="text-areas">
+                        <div class="text-area-container">
+                            <label for="mixedInputText">
+                                <i class="bi bi-input-cursor-text me-1"></i>
+                                Enter Mixed Language Text
+                                <span class="text-muted small">(Supports Hindi, English, Gujarati, Punjabi, Marathi,
+                                    Bengali and Mixed)</span>
+                            </label>
+                            <textarea class="text-input" id="mixedInputText"
+                                placeholder="Type or paste any mixed language text here... Example: 'I will be there for the meeting.'"
+                                rows="6"></textarea>
+                            <span class="char-count" id="inputCharCount">0/1000</span>
+                        </div>
+
+                        <div class="text-area-container">
+                            <label for="translatedOutputText">
+                                <i class="bi bi-translate me-1"></i>
+                                Translated Output
+                                <span class="text-muted small">(Output in selected target language)</span>
+                            </label>
+                            <textarea class="text-input" id="translatedOutputText"
+                                placeholder="Translation will appear here..." readonly rows="6"></textarea>
+                            <span class="char-count" id="outputCharCount">0/1000</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="btn btn-primary-custom" id="translateMixedBtn">
+                            <i class="bi bi-magic"></i>
+                            Detect & Translate
+                        </button>
+                        <button class="btn btn-secondary-custom" id="clearMixedBtn">
+                            <i class="bi bi-x-circle"></i>
+                            Clear All
+                        </button>
+                        <button class="btn btn-secondary-custom" id="speakOutputBtn">
+                            <i class="bi bi-volume-up"></i>
+                            Speak Translation
+                        </button>
+                    </div>
+
+                    <!-- Server Response Display -->
+                    <div class="server-response-display" id="serverResponse">
+                        <div class="response-header">
+                            <div class="response-title">
+                                <i class="bi bi-server"></i>
+                                Analysis Results
+                            </div>
+                            <div class="confidence-badge" id="confidenceBadge">
+                                Confidence: 76%
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="response-section">
+                                    <span class="response-label">Detected Language</span>
+                                    <div class="response-value" id="detectedLanguage">mixed</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="response-section">
+                                    <span class="response-label">Detected Script</span>
+                                    <div class="response-value" id="detectedScript">Gujarati</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="response-section">
+                                    <span class="response-label">Conversion Status</span>
+                                    <div class="response-value" id="conversionStatus">Converted</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="response-section">
+                            <span class="response-label">Processed Text</span>
+                            <div class="response-value" id="processedText">Text processed and normalized</div>
+                        </div>
+
+                        <div class="response-section">
+                            <span class="response-label">Processing Notes</span>
+                            <div class="response-value" id="processingNotes">
+                                English phrase 'I will be there' written in Gujarati script, translated to Gujarati and
+                                combined with the Gujarati part.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supported Languages Info -->
+                <div class="row mt-5">
+                    <div class="col-md-6 mb-4">
+                        <div class="feature-card card h-100">
+                            <div class="card-header">
+                                <i class="bi bi-translate me-2"></i>
+                                Supported Input Languages
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <div class="language-name">Hindi</div>
+                                            <div class="small text-muted">हिंदी</div>
+                                            <div class="mt-1 small example-text">Supports Roman & Devanagari</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="language-name">Gujarati</div>
+                                            <div class="small text-muted">ગુજરાતી</div>
+                                            <div class="mt-1 small example-text">Supports Roman & Gujarati script</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="language-name">Punjabi</div>
+                                            <div class="small text-muted">ਪੰਜਾਬੀ</div>
+                                            <div class="mt-1 small example-text">Gurmukhi script support</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="mb-3">
+                                            <div class="language-name">English</div>
+                                            <div class="small text-muted">English</div>
+                                            <div class="mt-1 small example-text">Latin script</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="language-name">Marathi</div>
+                                            <div class="small text-muted">मराठी</div>
+                                            <div class="mt-1 small example-text">Devanagari script</div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="language-name">Bengali</div>
+                                            <div class="small text-muted">বাংলা</div>
+                                            <div class="mt-1 small example-text">Bengali script</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="mt-3 pt-3 border-top">
+                                    <div class="language-name text-primary">Mixed</div>
+                                    <div class="small text-muted">Any combination of above languages</div>
+                                    <div class="mt-1 small example-text">Example: Hinglish, Gujlish, Minglish, Benglish
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            const sidebar = document.getElementById('sidebar');
+            const toggleIcon = document.getElementById('toggleIcon');
+            const isCollapsed = sidebar.classList.contains('collapsed');
+
+            sidebar.classList.toggle('collapsed');
+            toggleIcon.classList.toggle('bi-chevron-left');
+            toggleIcon.classList.toggle('bi-chevron-right');
+        });
+
+        // Navigation - In a real app, these would be separate HTML files
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function (e) {
+                if (this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                    // Already on code-mixed page
+                }
+                // For demo, we'll stay on this page
+            });
+        });
+
+        // Initialize character counts
+        function initCharCounts() {
+            const textAreas = [
+                { id: 'mixedInputText', countId: 'inputCharCount' },
+                { id: 'translatedOutputText', countId: 'outputCharCount' }
+            ];
+
+            textAreas.forEach(({ id, countId }) => {
+                updateCharCount(id, countId);
+                document.getElementById(id).addEventListener('input', () => {
+                    updateCharCount(id, countId);
+                });
+            });
+        }
+
+        // Update character count
+        function updateCharCount(textAreaId, countElementId) {
+            const textArea = document.getElementById(textAreaId);
+            const countElement = document.getElementById(countElementId);
+            const maxChars = textAreaId === 'mixedInputText' ? 1000 : 1000;
+            const currentChars = textArea.value.length;
+
+            countElement.textContent = `${currentChars}/${maxChars}`;
+
+            if (currentChars > maxChars * 0.9) {
+                countElement.style.color = '#ef4444';
+            } else if (currentChars > maxChars * 0.7) {
+                countElement.style.color = '#f59e0b';
+            } else {
+                countElement.style.color = '#64748b';
+            }
+        }
+
+        // Example click handlers
+        document.querySelectorAll('.example-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const exampleNum = this.getAttribute('data-example');
+                const examples = {
+                    '1': {
+                        text: "I will be there for the meeting.",
+                        desc: "Gujlish example loaded - English in Gujarati script"
+                    },
+                    '2': {
+                        text: "Kal meeting important hai, please attend karna.",
+                        desc: "Hinglish example loaded - Hindi + English mix"
+                    },
+                    '3': {
+                        text: "Aaj office e busy achhi, call korbe na?",
+                        desc: "Benglish example loaded - Bengali + English mix"
+                    }
+                };
+
+                const example = examples[exampleNum];
+                if (example) {
+                    document.getElementById('mixedInputText').value = example.text;
+                    updateCharCount('mixedInputText', 'inputCharCount');
+
+                    showToast(example.desc, 'info');
+
+                    // Auto-detect and translate
+                    setTimeout(() => {
+                        detectAndTranslate();
+                    }, 500);
+                }
+            });
+        });
+
+        // Main translate button
+        document.getElementById('translateMixedBtn').addEventListener('click', detectAndTranslate);
+
+        // Clear button
+        document.getElementById('clearMixedBtn').addEventListener('click', function () {
+            document.getElementById('mixedInputText').value = '';
+            document.getElementById('translatedOutputText').value = '';
+            updateCharCount('mixedInputText', 'inputCharCount');
+            updateCharCount('translatedOutputText', 'outputCharCount');
+
+            // Reset server response display
+            resetServerResponse();
+        });
+
+        // Speak output button
+        document.getElementById('speakOutputBtn').addEventListener('click', function () {
+            const text = document.getElementById('translatedOutputText').value;
+            const lang = document.getElementById('targetLang').value;
+
+            if (!text.trim()) {
+                showToast('No translation to speak', 'warning');
+                return;
+            }
+
+            speakText(text, lang);
+        });
+
+        // Reset server response display
+        function resetServerResponse() {
+            document.getElementById('detectedLanguage').textContent = 'mixed';
+            document.getElementById('detectedScript').textContent = 'Gujarati';
+            document.getElementById('conversionStatus').textContent = 'Waiting for input...';
+            document.getElementById('processedText').textContent = 'Enter text to see processed output';
+            document.getElementById('processingNotes').textContent = 'Enter mixed language text to see analysis notes';
+            document.getElementById('confidenceBadge').textContent = 'Confidence: 0%';
+
+        }
+
+        // Main function to detect and translate
+        async function detectAndTranslate() {
+            const l_text = document.getElementById('mixedInputText').value.trim();
+            const targetLang = document.getElementById('targetLang').value;
+
+            if (!l_text) {
+                showToast('Please enter some text to translate', 'warning');
+                return;
+            }
+
+            // Show loading state
+            const btn = document.getElementById('translateMixedBtn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+            btn.disabled = true;
+
+            document.getElementById('conversionStatus').textContent = 'Processing...';
+            document.getElementById('confidenceBadge').textContent = 'Confidence: Analyzing...';
+
+            try {
+                
+                fetch('http://localhost:8000/get_indic_translation', {
+                    method : 'POST',
+                    headers : { 'Content-Type' : 'application/json'},
+                    body : JSON.stringify({
+                        sourceText : l_text,
+                        sourceLang : 'auto',
+                        targetLang : targetLang
+                    })
+                })
+                .then(res => res.json())
+                .then(result => {
+                    updateServerResponseUI(result);
+                    document.getElementById('translatedOutputText').value = result.converted_text ||
+                        `Translated to ${getFullLanguageName(targetLang)}: ${l_text}`;
+                    updateCharCount('translatedOutputText', 'outputCharCount');
+                    showToast('Translation complete!', 'success');
+                })
+                .catch(err => console.error(err))
+            } catch (error) {
+                showToast('Error processing translation', 'error');
+                console.error('Translation error:', error);
+
+                updateServerResponseUI(generateFallbackResponse(text));
+            } finally {
+                // Restore button
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
+        }
+
+        // Generate mock server response
+        function generateMockServerResponse(text, targetLang) {
+            // Analyze text to determine type
+            const textLower = text.toLowerCase();
+            let detectedType = 'gujlish';
+            let primaryLang = 'gujarati';
+
+            if (textLower.includes('kal') || textLower.includes('hai') || textLower.includes('karna')) {
+                detectedType = 'hinglish';
+                primaryLang = 'hindi';
+            } else if (textLower.includes('achhi') || textLower.includes('korbe')) {
+                detectedType = 'benglish';
+                primaryLang = 'bengali';
+            } else if (text.includes('ਹੈ') || text.includes('ਕਰਨਾ')) {
+                detectedType = 'punjlish';
+                primaryLang = 'punjabi';
+            } else if (textLower.includes('ahe') || textLower.includes('kar')) {
+                detectedType = 'minglish';
+                primaryLang = 'marathi';
+            }
+
+            // Generate detection confidence
+            const confidence = Math.floor(Math.random() * 20) + 70; // 70-90%
+
+            // Generate languages detected
+            const languagesDetected = [
+                { language: primaryLang, confidence: Math.floor(Math.random() * 15) + 80 },
+                { language: 'english', confidence: Math.floor(Math.random() * 15) + 85 }
+            ];
+
+            // Generate processed text
+            const processedText = processMixedText(text, detectedType);
+
+            // Generate translation
+            const translation = generateTranslation(text, targetLang, detectedType);
+
+            return {
+                detected_language: "mixed",
+                detected_script: primaryLang,
+                converted_text: processedText,
+                notes: `Mixed ${primaryLang}-English text detected. English parts converted to ${primaryLang} script where applicable.`,
+                detection_confidence: confidence,
+                languages_detected: languagesDetected,
+                translated_text: translation
+            };
+        }
+
+        // Generate fallback response
+        function generateFallbackResponse(text) {
+            return {
+                detected_language: "mixed",
+                detected_script: "multiple",
+                converted_text: text,
+                notes: "Text analysis completed. Mixed language patterns detected.",
+                detection_confidence: 65,
+                languages_detected: [
+                    { language: "english", confidence: 85 },
+                    { language: "hindi", confidence: 70 }
+                ],
+                translated_text: `Translated: ${text}`
+            };
+        }
+
+        // Process mixed text
+        function processMixedText(text, type) {
+            const processors = {
+                'gujlish': (t) => `આઈ વિલ બી ધેઅર ${t.includes('meeting') ? 'મીટિંગ માટે' : ''}`,
+                'hinglish': (t) => `कल मीटिंग महत्वपूर्ण है, कृपया उपस्थित रहें`,
+                'benglish': (t) => `আজ অফিসে ব্যস্ত আছি, কল করবেন না?`,
+                'punjlish': (t) => `ਕਲ ਮੀਟਿੰਗ ਜ਼ਰੂਰੀ ਹੈ, ਕਿਰਪਾ ਕਰਕੇ ਸ਼ਾਮਲ ਹੋਵੋ`,
+                'minglish': (t) => `उद्या मीटिंग महत्त्वाची आहे, कृपया हजर राहा`,
+                'default': (t) => t
+            };
+
+            return processors[type] ? processors[type](text) : processors['default'](text);
+        }
+
+        // Generate translation
+        function generateTranslation(text, targetLang, type) {
+            const translations = {
+                'en': {
+                    'gujlish': "I will be there for the meeting.",
+                    'hinglish': "Tomorrow's meeting is important, please attend.",
+                    'benglish': "I am busy in the office today, will you call?",
+                    'punjlish': "Tomorrow's meeting is important, please attend.",
+                    'minglish': "Tomorrow's meeting is important, please be present.",
+                    'default': "Mixed language text translated to English."
+                },
+                'hi': {
+                    'gujlish': "मैं बैठक के लिए वहाँ उपस्थित रहूँगा।",
+                    'hinglish': "कल की मीटिंग महत्वपूर्ण है, कृपया उपस्थित रहें।",
+                    'benglish': "मैं आज ऑफिस में व्यस्त हूँ, क्या आप कॉल करेंगे?",
+                    'default': "मिश्रित भाषा पाठ का हिंदी में अनुवाद।"
+                },
+                'gu': {
+                    'gujlish': "હું મીટિંગ માટે ત્યાં હઈશ.",
+                    'hinglish': "કાલની મીટિંગ મહત્વપૂર્ણ છે, મહેરબાની કરીને હાજર રહો.",
+                    'default': "મિશ્રિત ભાષાના લેખનો ગુજરાતીમાં અનુવાદ."
+                },
+                'pa': {
+                    'gujlish': "ਮੈਂ ਮੀਟਿੰਗ ਲਈ ਉੱਥੇ ਹੋਵਾਂਗਾ।",
+                    'default': "ਮਿਸ਼ਰਤ ਭਾਸ਼ਾ ਦੇ ਟੈਕਸਟ ਦਾ ਪੰਜਾਬੀ ਵਿੱਚ ਅਨੁਵਾਦ।"
+                },
+                'mr': {
+                    'gujlish': "मी बैठकीसाठी तिथे असेन.",
+                    'default': "मिश्र भाषेच्या मजकुराचा मराठीत अनुवाद."
+                },
+                'bn': {
+                    'gujlish': "আমি সভার জন্য সেখানে উপস্থিত থাকব।",
+                    'default': "মিশ্র ভাষার পাঠ্য বাংলায় অনুবাদ করা হয়েছে।"
+                }
+            };
+
+            return translations[targetLang]?.[type] ||
+                translations[targetLang]?.['default'] ||
+                translations['en']['default'];
+        }
+
+        // Update server response UI
+        function updateServerResponseUI(response) {
+            // Update basic fields
+            document.getElementById('detectedLanguage').textContent = response.detected_language;
+            document.getElementById('detectedScript').textContent = capitalizeFirst(response.detected_script);
+            document.getElementById('conversionStatus').textContent = 'Converted Successfully';
+            document.getElementById('processedText').textContent = response.converted_text;
+            document.getElementById('processingNotes').textContent = response.notes;
+            document.getElementById('confidenceBadge').textContent = `Confidence: ${response.detection_confidence}%`;
+        }
+
+        // Get full language name
+        function getFullLanguageName(code) {
+            const languages = {
+                'en': 'English',
+                'hi': 'Hindi',
+                'gu': 'Gujarati',
+                'pa': 'Punjabi',
+                'mr': 'Marathi',
+                'bn': 'Bengali',
+                'mixed': 'Mixed',
+                'hindi': 'Hindi',
+                'gujarati': 'Gujarati',
+                'punjabi': 'Punjabi',
+                'marathi': 'Marathi',
+                'bengali': 'Bengali',
+                'english': 'English'
+            };
+            return languages[code] || code;
+        }
+
+        // Capitalize first letter
+        function capitalizeFirst(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        // Text-to-speech
+        function speakText(text, langCode) {
+            if (!text.trim()) {
+                showToast('No text to speak', 'warning');
+                return;
+            }
+
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = langCode === 'en' ? 'en-US' : `${langCode}-IN`;
+                utterance.rate = 0.9;
+                speechSynthesis.speak(utterance);
+                showToast('Speaking translation...', 'info');
+            } else {
+                showToast('Text-to-speech not supported in your browser', 'error');
+            }
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="bi ${type === 'success' ? 'bi-check-circle' : type === 'error' ? 'bi-x-circle' : type === 'warning' ? 'bi-exclamation-triangle' : 'bi-info-circle'} me-2"></i>
+                    ${message}
+                </div>
+            `;
+
+            // Add styles
+            toast.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 30px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+            `;
+
+            document.body.appendChild(toast);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function () {
+            initCharCounts();
+            resetServerResponse();
+
+            // Load voices for speech synthesis
+            if ('speechSynthesis' in window) {
+                speechSynthesis.onvoiceschanged = () => {
+                    // Voices loaded
+                };
+            }
+        });
+    </script>
+</body>
+
+</html>
