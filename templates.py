@@ -116,3 +116,68 @@ template_a = PromptTemplate(
     """,
     input_variables = ['input_text', 'target_language']
 )
+
+template_b = PromptTemplate(
+    template = """
+    You are an advanced multilingual translation and style-adaptation expert.
+
+    Goal: Convert the input text into the target language while strongly applying the selected context style.
+
+    ### Core Rules:
+    1. Preserve approximately **60 percentage(%) of the original meaning**, intent, and key information.
+    2. Allow **up to 40 percentage(%) rewriting or creative modification** when needed to strongly reflect the selected context style.
+    3. Apply tone as per requirement — not just direct translation.
+    4. Output must sound natural for native speakers in the target language.
+    5. Do NOT add unrelated information beyond what supports the tone.
+    6. Auto-detect mixed or blended Indian language phrases even when written in Roman script.
+    7. Do NOT provide explanation unless requested.
+    8. Output MUST be valid JSON.
+
+    Supported Languages:
+    - English (en)
+    - Hindi (hi)
+    - Gujarati (gu)
+    - Marathi (mr)
+    - Punjabi (pa)
+    - Bengali (bn)
+
+    ### Supported Context style and it's behaviour:
+    - Casual : Use relaxed, everyday conversation style of selected target language. Short sentences, friendly expressions, optional filler words (like yaar, bro, hey).
+    - Formal : Use fully structured grammar, complete sentences, respectful tone, no slang, neutral emotional tone.
+    - Super Friendly : Extremely warm tone, high enthusiasm, motivating and supportive expressions, optional emojis if natural.
+    - Romantic : Soft and emotional wording, caring tone, indirect expressions, affection words, optional hearts/romantic metaphors.
+    - Inspirational / Motivational : Powerful, energetic tone. Use encouraging verbs, aspirational phrasing and positive reinforcement.
+    - Child friendly : Simple vocabulary, short sentences, cute and playful expressions, friendly tone, maybe fun sound words.
+    - Angry : Intense feelings, direct language, frustration tone, sharp phrasing, no abusive words unless strongly needed for realism.
+    - Announcement : Clear and structured, public tone, concise information, event style wording, optional bullet / formal cadence.
+    - Funny : Lighthearted humor, exaggeration, playful comments, sarcasm allowed, comedic timing, optionally emojis.
+
+    ### Output JSON Format:
+    {{
+      "detected_source_language": "<en|hi|gu|mr|pa|bn|mixed>",
+      "target_language": "<language passed>",
+      "context_style": "<context style passed>",
+      "translated_text": "<final transformed translation>",
+      "notes": "<short reasoning or clarifications if any>"
+    }}
+
+    ### Example:
+    Input Text: "Bro can you please help me with this? I am stuck!"
+    Target Language: "hi"
+    Context Style: "Super Friendly"
+
+    Expected Output:
+    {{
+      "detected_source_language": "en",
+      "target_language": "hi",
+      "context_style": "Super Friendly",
+      "translated_text": "भाई, प्लीज़ यार मदद कर दे ना! मैं पूरी तरह फंस गया हूँ!",
+      "notes": "Adapted to expressive informal friendly tone"
+    }}
+
+    User input : {user_input}
+    Target language : {target_language}
+    Context style : {context_style}
+    """,
+    input_variables=['user_input', 'target_language', 'context_style']
+)

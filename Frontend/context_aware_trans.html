@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolyGlot Translator</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #7c3aed;
+            --accent-color: #06b6d4;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --sidebar-active: #0f172a;
+            --sidebar-text: #cbd5e1;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --sidebar-width: 260px;
+            --sidebar-collapsed: 70px;
+            --header-height: 70px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: var(--text-primary);
+            height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Parent Layout */
+        .layout-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+        
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: white;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+        
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-text {
+            transition: opacity 0.3s ease;
+            font-size: 1.2rem;
+        }
+        
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+        
+        /* Navigation Menu */
+        .nav-menu {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+        
+        .nav-item {
+            margin: 4px 12px;
+        }
+        
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            background: var(--sidebar-hover);
+            color: white;
+            transform: translateX(2px);
+        }
+        
+        .nav-link.active {
+            background: var(--sidebar-active);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background: var(--accent-color);
+            border-radius: 0 2px 2px 0;
+        }
+        
+        .nav-icon {
+            font-size: 1.2rem;
+            min-width: 24px;
+            text-align: center;
+        }
+        
+        .nav-text {
+            transition: opacity 0.3s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .sidebar.collapsed .nav-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+        
+        /* Sidebar Toggle */
+        .sidebar-toggle {
+            margin: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar.collapsed ~ .main-content {
+            margin-left: var(--sidebar-collapsed);
+        }
+        
+        /* Header */
+        .main-header {
+            height: var(--header-height);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .user-profile:hover {
+            background: #e2e8f0;
+        }
+        
+        /* Content Area */
+        .content-wrapper {
+            padding: 30px;
+            min-height: calc(100vh - var(--header-height));
+        }
+        
+        /* Context Translation Interface */
+        .context-interface {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Language and Context Selection */
+        .selection-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .selection-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+        
+        .selection-box {
+            flex: 1;
+        }
+        
+        .selection-box label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            display: block;
+            font-size: 0.95rem;
+        }
+        
+        .language-select, .context-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 16px 12px;
+        }
+        
+        .language-select:focus, .context-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        /* Text Areas */
+        .text-areas {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+        
+        @media (max-width: 992px) {
+            .text-areas {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .text-area-container {
+            position: relative;
+        }
+        
+        .text-area-container label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            display: block;
+            font-size: 0.95rem;
+        }
+        
+        .text-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            background: white;
+            color: var(--text-primary);
+            resize: vertical;
+            transition: all 0.2s ease;
+        }
+        
+        .text-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        
+        .text-input[readonly] {
+            background: #f8fafc;
+            cursor: not-allowed;
+        }
+        
+        .char-count {
+            position: absolute;
+            bottom: 12px;
+            right: 16px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .btn-primary-custom {
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+        
+        .btn-primary-custom:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+            color: white;
+        }
+        
+        .btn-secondary-custom {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-secondary-custom:hover {
+            background: #f1f5f9;
+            border-color: var(--primary-color);
+        }
+        
+        /* Processing Animation */
+        .processing-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            z-index: 10;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .processing-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .processing-content {
+            text-align: center;
+            max-width: 300px;
+        }
+        
+        .processing-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        .processing-text {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+        
+        .processing-subtext {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        #contextStyle
+        {
+            font-weight: bold;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Context Examples */
+        .context-examples {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .context-examples-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .context-example-item {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.9rem;
+        }
+        
+        .context-example-item:hover {
+            background: #f1f5f9;
+            border-color: var(--primary-color);
+        }
+
+        #outputText{
+            font-weight: bold;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: var(--sidebar-collapsed);
+            }
+            
+            .sidebar:not(.collapsed) {
+                width: var(--sidebar-width);
+            }
+            
+            .main-content {
+                margin-left: var(--sidebar-collapsed);
+            }
+            
+            .sidebar:not(.collapsed) ~ .main-content {
+                margin-left: var(--sidebar-width);
+            }
+            
+            .content-wrapper {
+                padding: 20px 15px;
+            }
+            
+            .context-interface {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Parent Layout -->
+    <div class="layout-container">
+        <!-- Left Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <div class="logo-icon">
+                        <i class="bi bi-translate"></i>
+                    </div>
+                    <span class="logo-text">PolyGlot</span>
+                </a>
+            </div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="index.html" class="nav-link">
+                        <i class="bi bi-globe nav-icon"></i>
+                        <span class="nav-text">Translation Core</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="normalization.html" class="nav-link">
+                        <i class="bi bi-input-cursor-text nav-icon"></i>
+                        <span class="nav-text">Input Normalization</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="transliteration.html" class="nav-link">
+                        <i class="bi bi-fonts nav-icon"></i>
+                        <span class="nav-text">Transliteration</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-page="context">
+                        <i class="bi bi-text-paragraph nav-icon"></i>
+                        <span class="nav-text">Context-Aware</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="tone.html" class="nav-link">
+                        <i class="bi bi-magic nav-icon"></i>
+                        <span class="nav-text">Tone & Style</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="code-mixed.html" class="nav-link">
+                        <i class="bi bi-code-slash nav-icon"></i>
+                        <span class="nav-text">Code-Mixed</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="bi bi-chevron-left" id="toggleIcon"></i>
+            </button>
+        </aside>
+        
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <h1 class="page-title" id="pageTitle">Context-Aware Translation</h1>
+                <div class="user-profile">
+                    <span>Welcome, User</span>
+                    <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
+                </div>
+            </header>
+            
+            <!-- Page Content -->
+            <div class="content-wrapper" id="pageContent">
+                <!-- Context Translation Interface -->
+                <div class="context-interface">
+                    <!-- Language and Context Selection -->
+                    <div class="selection-row">
+                        <div class="selection-box">
+                            <label for="targetLang">
+                                <i class="bi bi-translate me-1"></i>
+                                Select Target Language
+                            </label>
+                            <select class="language-select" id="targetLang">
+                                <option value="hi" selected>Hindi (हिंदी)</option>
+                                <option value="en">English</option>
+                                <option value="gu">Gujarati (ગુજરાતી)</option>
+                                <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+                                <option value="mr">Marathi (मराठी)</option>
+                                <option value="bn">Bengali (বাংলা)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="selection-box">
+                            <label for="contextStyle">
+                                <i class="bi bi-chat-square-text me-1"></i>
+                                Select Context Style
+                            </label>
+                            <select class="context-select" id="contextStyle">
+                                <option value="casual" selected>Casual 😎</option>
+                                <option value="formal">Formal 👔</option>
+                                <option value="super_friendly">Super Friendly 💖</option>
+                                <option value="romantic">Romantic 💏</option>
+                                <option value="inspirational">Inspirational / Motivational ❤️‍🔥</option>
+                                <option value="child">Child friendly 👧</option>
+                                <option value="angry">Angry 🤬</option>
+                                <option value="announcement">Announcement 📢</option>
+                                <option value="funny">Funny 🤣</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Text Areas -->
+                    <div class="text-areas">
+                        <div class="text-area-container">
+                            <label for="inputText">
+                                <i class="bi bi-input-cursor-text me-1"></i>
+                                Enter Text to Translate
+                            </label>
+                            <textarea 
+                                class="text-input" 
+                                id="inputText" 
+                                placeholder="Type or paste your text here..."
+                                rows="8"
+                            >Can you help me with this document? I need to finish it by tomorrow.</textarea>
+                            <span class="char-count" id="inputCharCount">0/1000</span>
+                        </div>
+                        
+                        <div class="text-area-container">
+                            <label for="outputText">
+                                <i class="bi bi-translate me-1"></i>
+                                Context-Aware Translation
+                            </label>
+                            <textarea 
+                                class="text-input" 
+                                id="outputText" 
+                                placeholder="Translation will appear here..."
+                                readonly
+                                rows="8"
+                            ></textarea>
+                            <span class="char-count" id="outputCharCount">0/1000</span>
+                            
+                            <!-- Processing Animation Overlay -->
+                            <div class="processing-overlay" id="processingOverlay">
+                                <div class="processing-content">
+                                    <div class="processing-spinner"></div>
+                                    <div class="processing-text">Translating with Context</div>
+                                    <div class="processing-subtext" id="processingSubtext">Applying Casual style...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="btn btn-primary-custom" id="translateBtn">
+                            <i class="bi bi-translate"></i>
+                            Translate with Context
+                        </button>
+                        <button class="btn btn-secondary-custom" id="clearBtn">
+                            <i class="bi bi-x-circle"></i>
+                            Clear All
+                        </button>
+                    </div>
+                    
+                    <!-- Context Examples -->
+                    <div class="context-examples">
+                        <div class="context-examples-title">
+                            <i class="bi bi-lightbulb"></i>
+                            Try Different Context Examples
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-2">
+                                <div class="context-example-item" data-example="1">
+                                    "Can we meet tomorrow to discuss the project?"
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <div class="context-example-item" data-example="2">
+                                    "I really appreciate your help with this matter."
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-2">
+                                <div class="context-example-item" data-example="3">
+                                    "You're amazing and I wanted to tell you how much you mean to me."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleIcon = document.getElementById('toggleIcon');
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            
+            sidebar.classList.toggle('collapsed');
+            toggleIcon.classList.toggle('bi-chevron-left');
+            toggleIcon.classList.toggle('bi-chevron-right');
+        });
+
+        // Navigation
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Initialize character counts
+        function initCharCounts() {
+            const textAreas = [
+                {id: 'inputText', countId: 'inputCharCount'},
+                {id: 'outputText', countId: 'outputCharCount'}
+            ];
+            
+            textAreas.forEach(({id, countId}) => {
+                updateCharCount(id, countId);
+                document.getElementById(id).addEventListener('input', () => {
+                    updateCharCount(id, countId);
+                });
+            });
+        }
+
+        // Update character count
+        function updateCharCount(textAreaId, countElementId) {
+            const textArea = document.getElementById(textAreaId);
+            const countElement = document.getElementById(countElementId);
+            const maxChars = 1000;
+            const currentChars = textArea.value.length;
+            
+            countElement.textContent = `${currentChars}/${maxChars}`;
+            
+            if (currentChars > maxChars * 0.9) {
+                countElement.style.color = '#ef4444';
+            } else if (currentChars > maxChars * 0.7) {
+                countElement.style.color = '#f59e0b';
+            } else {
+                countElement.style.color = '#64748b';
+            }
+        }
+
+        // Context example click handlers
+        document.querySelectorAll('.context-example-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const exampleNum = this.getAttribute('data-example');
+                const examples = {
+                    '1': {
+                        text: "Can we meet tomorrow to discuss the project?",
+                        context: "professional_email"
+                    },
+                    '2': {
+                        text: "I really appreciate your help with this matter.",
+                        context: "formal"
+                    },
+                    '3': {
+                        text: "You're amazing and I wanted to tell you how much you mean to me.",
+                        context: "romantic"
+                    }
+                };
+                
+                const example = examples[exampleNum];
+                if (example) {
+                    document.getElementById('inputText').value = example.text;
+                    document.getElementById('contextStyle').value = example.context;
+                    updateCharCount('inputText', 'inputCharCount');
+                    
+                    // Auto-translate
+                    setTimeout(() => {
+                        translateWithContext();
+                    }, 500);
+                }
+            });
+        });
+
+        // Main translate button
+        document.getElementById('translateBtn').addEventListener('click', translateWithContext);
+
+        // Clear button
+        document.getElementById('clearBtn').addEventListener('click', function() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+            updateCharCount('inputText', 'inputCharCount');
+            updateCharCount('outputText', 'outputCharCount');
+        });
+
+        // Show processing animation
+        function showProcessing() {
+            const overlay = document.getElementById('processingOverlay');
+            const contextStyle = document.getElementById('contextStyle').value;
+            const styleName = getContextStyleName(contextStyle);
+            
+            document.getElementById('processingSubtext').textContent = `Applying ${styleName} style...`;
+            overlay.classList.add('active');
+        }
+
+        // Hide processing animation
+        function hideProcessing() {
+            const overlay = document.getElementById('processingOverlay');
+            overlay.classList.remove('active');
+        }
+
+        // Main translation function
+        async function translateWithContext() {
+            const text = document.getElementById('inputText').value.trim();
+            const targetLang = document.getElementById('targetLang').value;
+            const contextStyle = document.getElementById('contextStyle').value;
+            console.log(text)
+            console.log(targetLang)
+            console.log(contextStyle)
+            if (!text) {
+                showToast('Please enter some text to translate', 'warning');
+                return;
+            }
+
+            const btn = document.getElementById('translateBtn');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
+            btn.disabled = true;
+            
+            // Show processing animation
+            showProcessing();
+
+            fetch('http://localhost:8000/get_context_aware_translation', {
+                method : 'POST',
+                headers : { 'Content-Type' : 'application/json' },
+                body : JSON.stringify({
+                    sourceText : text,
+                    targetLang : targetLang,
+                    sourceLang : contextStyle      
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('outputText').value = data.translated_text;
+                updateCharCount('outputText', 'outputCharCount');
+                showToast('Translation complete!', 'success');
+
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                hideProcessing();
+            })
+            .catch(err => console.error(err))
+        }
+
+        // Simulate translation API call
+        function simulateTranslation(text, targetLang, contextStyle) {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    // Generate mock translation based on context
+                    const translation = generateContextTranslation(text, targetLang, contextStyle);
+                    resolve(translation);
+                }, 2000); // 2 second delay to show animation
+            });
+        }
+
+        // Generate context-based translation
+        function generateContextTranslation(text, targetLang, contextStyle) {
+            // Base translations for different languages
+            const baseTranslations = {
+                'hi': {
+                    'casual': "क्या तुम मेरी इस डॉक्यूमेंट में मदद कर सकते हो? मुझे इसे कल तक खत्म करना है।",
+                    'formal': "क्या आप इस दस्तावेज़ में मेरी सहायता कर सकते हैं? मुझे इसे कल तक पूरा करना आवश्यक है।",
+                    'super_friendly': "भाई, इस डॉक्यूमेंट में मेरी थोड़ी सी मदद कर दो ना! कल तक तो पूरा करना ही है।",
+                    'professional_email': "प्रिय सर/मैडम,\n\nक्या आप इस दस्तावेज़ में मेरी सहायता कर सकते हैं? मुझे इसे कल तक पूरा करना आवश्यक है।\n\nधन्यवाद,\n[आपका नाम]",
+                    'romantic': "प्रिय, क्या तुम मेरी इस डॉक्यूमेंट में मदद कर सकते हो? मुझे इसे कल तक खत्म करना है, और तुम्हारी मदद से सब कुछ आसान हो जाएगा।"
+                },
+                'en': {
+                    'casual': "Hey, can you help me out with this doc? Gotta finish it by tomorrow.",
+                    'formal': "Could you please assist me with this document? I need to complete it by tomorrow.",
+                    'super_friendly': "Hey buddy! Mind giving me a hand with this document? Really need to wrap it up by tomorrow!",
+                    'professional_email': "Dear Sir/Madam,\n\nI would appreciate your assistance with this document. I need to complete it by tomorrow.\n\nThank you,\n[Your Name]",
+                    'romantic': "My love, would you be able to help me with this document? I need to finish it by tomorrow, and your help would make everything easier."
+                },
+                'gu': {
+                    'casual': "શું તમે મને આ ડોક્યુમેન્ટમાં મદદ કરી શકો છો? મારે આ કાલ સુધીમાં પૂરું કરવું છે.",
+                    'formal': "શું તમે આ દસ્તાવેજમાં મારી સહાયતા કરી શકો છો? મારે આ કાલ સુધીમાં પૂર્ણ કરવાની આવશ્યકતા છે.",
+                    'super_friendly': "ભાઈ, આ ડોક્યુમેન્ટમાં મારી થોડી મદદ કરી દેશો? કાલ સુધીમાં તો પૂરું કરવું જ છે!",
+                    'professional_email': "પ્રિય સર/મેડમ,\n\nશું તમે આ દસ્તાવેજમાં મારી સહાયતા કરી શકો છો? મારે આ કાલ સુધીમાં પૂર્ણ કરવાની આવશ્યકતા છે.\n\nઆભાર,\n[તમારું નામ]",
+                    'romantic': "પ્રિય, શું તમે મને આ ડોક્યુમેન્ટમાં મદદ કરી શકો છો? મારે આ કાલ સુધીમાં પૂરું કરવું છે, અને તમારી મદથી બધું સરળ થઈ જશે."
+                },
+                'pa': {
+                    'casual': "ਕੀ ਤੁਸੀਂ ਮੇਰੀ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਖਤਮ ਕਰਨਾ ਹੈ।",
+                    'formal': "ਕੀ ਤੁਸੀਂ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮੇਰੀ ਸਹਾਇਤਾ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਪੂਰਾ ਕਰਨ ਦੀ ਲੋੜ ਹੈ।",
+                    'super_friendly': "ਵੇ ਯਾਰ, ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮੇਰੀ ਥੋੜੀ ਜਿਹੀ ਮਦਦ ਕਰ ਦੇਵੋ! ਕੱਲ ਤੱਕ ਤਾਂ ਪੂਰਾ ਕਰਨਾ ਹੀ ਹੈ।",
+                    'professional_email': "ਪਿਆਰੇ ਸਰ/ਮੈਡਮ,\n\nਕੀ ਤੁਸੀਂ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮੇਰੀ ਸਹਾਇਤਾ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਪੂਰਾ ਕਰਨ ਦੀ ਲੋੜ ਹੈ।\n\nਧੰਨਵਾਦ,\n[ਤੁਹਾਡਾ ਨਾਮ]",
+                    'romantic': "ਪਿਆਰੇ, ਕੀ ਤੁਸੀਂ ਮੇਰੀ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਖਤਮ ਕਰਨਾ ਹੈ, ਅਤੇ ਤੁਹਾਡੀ ਮਦਦ ਨਾਲ ਸਭ ਕੁਝ ਆਸਾਨ ਹੋ ਜਾਵੇਗਾ।"
+                }
+            };
+
+            // Get the translation or show a default
+            if (baseTranslations[targetLang] && baseTranslations[targetLang][contextStyle]) {
+                return baseTranslations[targetLang][contextStyle];
+            } else if (baseTranslations[targetLang] && baseTranslations[targetLang]['casual']) {
+                return baseTranslations[targetLang]['casual'];
+            } else {
+                return `[${getContextStyleName(contextStyle)} translation to ${getLanguageName(targetLang)}]: ${text}`;
+            }
+        }
+
+        // Get context style name for display
+        function getContextStyleName(styleCode) {
+            const styles = {
+                'casual': 'Casual',
+                'formal': 'Formal',
+                'super_friendly': 'Super Friendly',
+                'professional_email': 'Professional Email',
+                'romantic': 'Romantic'
+            };
+            return styles[styleCode] || styleCode;
+        }
+
+        // Get language name for display
+        function getLanguageName(code) {
+            const languages = {
+                'en': 'English',
+                'hi': 'Hindi',
+                'gu': 'Gujarati',
+                'pa': 'Punjabi',
+                'mr': 'Marathi',
+                'bn': 'Bengali'
+            };
+            return languages[code] || code;
+        }
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="bi ${type === 'success' ? 'bi-check-circle' : type === 'error' ? 'bi-x-circle' : type === 'warning' ? 'bi-exclamation-triangle' : 'bi-info-circle'} me-2"></i>
+                    ${message}
+                </div>
+            `;
+
+            // Add styles
+            toast.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 30px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+            `;
+
+            document.body.appendChild(toast);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharCounts();
+        });
+    </script>
+</body>
+</html>
