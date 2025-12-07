@@ -33,7 +33,8 @@ translator = Translator()
 
 llm = GoogleGenerativeAI(
     model = "gemini-2.5-flash",
-    api_key = os.getenv("GOOGLE_LLM_API")
+    # api_key = os.getenv("GOOGLE_LLM_API")
+    api_key = "AIzaSyAv7wLlGHD77oUeLCkVIYIS-MCSOEEV090"
 )
 
 output_parser = JsonOutputParser()
