@@ -244,31 +244,35 @@
             min-height: calc(100vh - var(--header-height));
         }
         
-        /* Context Translation Interface */
-        .context-interface {
+        /* Dialect Translation Interface */
+        .dialect-interface {
             background: white;
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 25px;
             margin-bottom: 30px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
         }
         
-        /* Language and Context Selection */
-        .selection-row {
+        /* Language Selection */
+        .language-selection {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
         
         @media (max-width: 768px) {
-            .selection-row {
+            .language-selection {
                 grid-template-columns: 1fr;
                 gap: 15px;
             }
+        }
+        
+        .dialect-selection {
+            margin-bottom: 30px;
         }
         
         .selection-box {
@@ -283,7 +287,7 @@
             font-size: 0.95rem;
         }
         
-        .language-select, .context-select {
+        .language-select, .dialect-select {
             width: 100%;
             padding: 12px 16px;
             border: 1px solid var(--border-color);
@@ -299,7 +303,7 @@
             background-size: 16px 12px;
         }
         
-        .language-select:focus, .context-select:focus {
+        .language-select:focus, .dialect-select:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
@@ -313,7 +317,7 @@
             margin-bottom: 25px;
         }
         
-        @media (max-width: 992px) {
+        @media (max-width: 768px) {
             .text-areas {
                 grid-template-columns: 1fr;
             }
@@ -333,7 +337,7 @@
         
         .text-input {
             width: 100%;
-            min-height: 200px;
+            min-height: 180px;
             padding: 16px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -462,50 +466,25 @@
             color: var(--text-secondary);
             font-size: 0.9rem;
         }
-
-        #contextStyle
-        {
-            font-weight: bold;
-        }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         
-        /* Context Examples */
-        .context-examples {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color);
-        }
-        
-        .context-examples-title {
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .context-example-item {
+        /* Dialect Description */
+        .dialect-description {
             background: #f8fafc;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 10px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
             font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: none;
         }
         
-        .context-example-item:hover {
-            background: #f1f5f9;
-            border-color: var(--primary-color);
-        }
-
-        #outputText{
-            font-weight: bold;
+        .dialect-description.active {
+            display: block;
         }
         
         /* Responsive */
@@ -530,7 +509,7 @@
                 padding: 20px 15px;
             }
             
-            .context-interface {
+            .dialect-interface {
                 padding: 20px;
             }
         }
@@ -564,7 +543,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="http://localhost:8000/" class="nav-link active" data-page="code-mixed">
+                    <a href="http://localhost:8000/" class="nav-link" data-page="code-mixed">
                         <i class="bi bi-code-slash nav-icon"></i>
                         <span class="nav-text">Code-Mixed</span>
                     </a>
@@ -586,7 +565,7 @@
         <main class="main-content">
             <!-- Header -->
             <header class="main-header">
-                <h1 class="page-title" id="pageTitle">Context-Aware Translation</h1>
+                <h1 class="page-title" id="pageTitle">Ghar Ki Boli - Dialect Translation</h1>
                 <div class="user-profile">
                     <span>Welcome, User</span>
                     <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
@@ -595,41 +574,48 @@
             
             <!-- Page Content -->
             <div class="content-wrapper" id="pageContent">
-                <!-- Context Translation Interface -->
-                <div class="context-interface">
-                    <!-- Language and Context Selection -->
-                    <div class="selection-row">
+                <!-- Dialect Translation Interface -->
+                <div class="dialect-interface">
+                    <!-- Language Selection -->
+                    <div class="language-selection">
                         <div class="selection-box">
-                            <label for="targetLang">
-                                <i class="bi bi-translate me-1"></i>
-                                Select Target Language
+                            <label for="sourceLang">
+                                <i class="bi bi-input-cursor-text me-1"></i>
+                                Source Language
                             </label>
-                            <select class="language-select" id="targetLang">
-                                <option value="hi" selected>Hindi (हिंदी)</option>
-                                <option value="en">English</option>
-                                <option value="gu">Gujarati (ગુજરાતી)</option>
-                                <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
-                                <option value="mr">Marathi (मराठी)</option>
-                                <option value="bn">Bengali (বাংলা)</option>
+                            <select class="language-select" id="sourceLang">
+                                <option value="hi">Hindi</option>
+                                <option value="en" selected>English</option>
+                                <option value="gu">Gujarati</option>
                             </select>
                         </div>
                         
                         <div class="selection-box">
-                            <label for="contextStyle">
-                                <i class="bi bi-chat-square-text me-1"></i>
-                                Select Context Style
+                            <label for="targetLang">
+                                <i class="bi bi-translate me-1"></i>
+                                Target Language
                             </label>
-                            <select class="context-select" id="contextStyle">
-                                <option value="casual" selected>Casual 😎</option>
-                                <option value="formal">Formal 👔</option>
-                                <option value="super_friendly">Super Friendly 💖</option>
-                                <option value="romantic">Romantic 💏</option>
-                                <option value="inspirational">Inspirational / Motivational ❤️‍🔥</option>
-                                <option value="child">Child friendly 👧</option>
-                                <option value="angry">Angry 🤬</option>
-                                <option value="announcement">Announcement 📢</option>
-                                <option value="funny">Funny 🤣</option>
+                            <select class="language-select" id="targetLang">
+                                <option value="hi" selected>Hindi</option>
+                                <option value="en">English</option>
+                                <option value="gu">Gujarati</option>
                             </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Dynamic Dialect Selection -->
+                    <div class="dialect-selection">
+                        <div class="selection-box">
+                            <label for="dialectSelect">
+                                <i class="bi bi-geo-alt me-1"></i>
+                                Select Dialect / Regional Variation
+                            </label>
+                            <select class="dialect-select" id="dialectSelect">
+                                <option value="">Select target language first</option>
+                            </select>
+                        </div>
+                        <div class="dialect-description" id="dialectDescription">
+                            <!-- Dialect description will appear here -->
                         </div>
                     </div>
                     
@@ -637,38 +623,39 @@
                     <div class="text-areas">
                         <div class="text-area-container">
                             <label for="inputText">
-                                <i class="bi bi-input-cursor-text me-1"></i>
-                                Enter Text to Translate
+                                <i class="bi bi-chat-left-text me-1"></i>
+                                Enter Text
+                                <span class="text-muted small">(Hindi, English, or Gujarati)</span>
                             </label>
                             <textarea 
                                 class="text-input" 
                                 id="inputText" 
                                 placeholder="Type or paste your text here..."
-                                rows="8"
-                            >Can you help me with this document? I need to finish it by tomorrow.</textarea>
-                            <span class="char-count" id="inputCharCount">0/1000</span>
+                                rows="6"
+                            >Hello, how are you doing today?</textarea>
+                            <span class="char-count" id="inputCharCount">0/500</span>
                         </div>
                         
                         <div class="text-area-container">
                             <label for="outputText">
                                 <i class="bi bi-translate me-1"></i>
-                                Context-Aware Translation
+                                Dialect Translation
                             </label>
                             <textarea 
                                 class="text-input" 
                                 id="outputText" 
-                                placeholder="Translation will appear here..."
+                                placeholder="Dialect translation will appear here..."
                                 readonly
-                                rows="8"
+                                rows="6"
                             ></textarea>
-                            <span class="char-count" id="outputCharCount">0/1000</span>
+                            <span class="char-count" id="outputCharCount">0/500</span>
                             
                             <!-- Processing Animation Overlay -->
                             <div class="processing-overlay" id="processingOverlay">
                                 <div class="processing-content">
                                     <div class="processing-spinner"></div>
-                                    <div class="processing-text">Translating with Context</div>
-                                    <div class="processing-subtext" id="processingSubtext">Applying Casual style...</div>
+                                    <div class="processing-text">Translating to Dialect</div>
+                                    <div class="processing-subtext" id="processingSubtext">Converting to selected regional variation...</div>
                                 </div>
                             </div>
                         </div>
@@ -678,37 +665,12 @@
                     <div class="action-buttons">
                         <button class="btn btn-primary-custom" id="translateBtn">
                             <i class="bi bi-translate"></i>
-                            Translate with Context
+                            Translate to Dialect
                         </button>
                         <button class="btn btn-secondary-custom" id="clearBtn">
                             <i class="bi bi-x-circle"></i>
                             Clear All
                         </button>
-                    </div>
-                    
-                    <!-- Context Examples -->
-                    <div class="context-examples">
-                        <div class="context-examples-title">
-                            <i class="bi bi-lightbulb"></i>
-                            Try Different Context Examples
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4 mb-2">
-                                <div class="context-example-item" data-example="1">
-                                    "Can we meet tomorrow to discuss the project?"
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-2">
-                                <div class="context-example-item" data-example="2">
-                                    "I really appreciate your help with this matter."
-                                </div>
-                            </div>
-                            <div class="col-md-4 mb-2">
-                                <div class="context-example-item" data-example="3">
-                                    "You're amazing and I wanted to tell you how much you mean to me."
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -739,6 +701,60 @@
             });
         });
 
+        // Dialect options data
+        const dialectOptions = {
+            'hi': [
+                { value: 'mumbai_tapori', label: 'Mumbai Tapori Hindi', description: 'Street-style Hindi with Mumbai slang' },
+                { value: 'up_awadhi', label: 'UP/Awadhi Hindi', description: 'Traditional Hindi from Uttar Pradesh with Awadhi influence' },
+                { value: 'bhojpuri', label: 'Bhojpuri', description: 'Vibrant Bhojpuri dialect from Eastern UP and Bihar' },
+                { value: 'haryanvi', label: 'Haryanvi', description: 'Rustic Hindi dialect from Haryana with unique vocabulary' },
+                { value: 'rajasthani_marwari', label: 'Rajasthani/Marwari', description: 'Royal Rajasthani dialect with Marwari influence' },
+                { value: 'bundelkhandi', label: 'Bundelkhandi', description: 'Hindi dialect from Bundelkhand region' }
+            ],
+            'gu': [
+                { value: 'standard_gujarati', label: 'Standard Gujarati', description: 'Formal, standard Gujarati language' },
+                { value: 'surati', label: 'Surati', description: 'Gujarati dialect from Surat region' },
+                { value: 'kathiyawadi', label: 'Kathiyawadi', description: 'Gujarati dialect from Kathiawar region' },
+                { value: 'charotari', label: 'Charotari', description: 'Gujarati dialect from Charotar region' },
+                { value: 'ahmedabad_urban', label: 'Ahmedabad Urban', description: 'Modern urban Gujarati from Ahmedabad' },
+                { value: 'kutchi_gujarati', label: 'Kutchi Gujarati', description: 'Gujarati with Kutchi regional influence' }
+            ],
+            'en': [
+                { value: 'standard_formal', label: 'Standard Formal English', description: 'Formal, standard English language' },
+                { value: 'casual_english', label: 'Casual English', description: 'Informal, everyday conversational English' },
+                { value: 'business_english', label: 'Business English', description: 'Professional English for business communication' },
+                { value: 'american_english', label: 'American English', description: 'American English with US spellings and idioms' },
+                { value: 'british_english', label: 'British English', description: 'British English with UK spellings and expressions' },
+                { value: 'hinglish', label: 'Hinglish', description: 'English mixed with Hindi words and phrases' },
+                { value: 'gujlish', label: 'Gujlish', description: 'English mixed with Gujarati words and phrases' },
+                { value: 'tapori_english', label: 'Tapori English', description: 'Street-style English with Mumbai Tapori influence' }
+            ]
+        };
+
+        // Dialect descriptions
+        const dialectDescriptions = {
+            'mumbai_tapori': 'Mumbai street slang mixed with Hindi - known for its unique vocabulary and expressions popular in Mumbai.',
+            'up_awadhi': 'Traditional Hindi dialect from Uttar Pradesh with Awadhi cultural influence and vocabulary.',
+            'bhojpuri': 'Vibrant and expressive dialect from Eastern Uttar Pradesh and Bihar regions.',
+            'haryanvi': 'Rustic dialect from Haryana with distinct pronunciation and rural vocabulary.',
+            'rajasthani_marwari': 'Royal dialect from Rajasthan with Marwari cultural influence.',
+            'bundelkhandi': 'Hindi dialect spoken in the Bundelkhand region with unique local expressions.',
+            'standard_gujarati': 'Formal Gujarati language as used in education and official communication.',
+            'surati': 'Gujarati dialect from Surat known for its speed and unique slang.',
+            'kathiyawadi': 'Gujarati from Kathiawar region with distinctive pronunciation and vocabulary.',
+            'charotari': 'Gujarati dialect from Charotar region known for its agricultural vocabulary.',
+            'ahmedabad_urban': 'Modern urban Gujarati with contemporary slang from Ahmedabad.',
+            'kutchi_gujarati': 'Gujarati influenced by Kutchi language from Kutch region.',
+            'standard_formal': 'Formal English suitable for official documents and professional communication.',
+            'casual_english': 'Everyday conversational English used in informal settings.',
+            'business_english': 'Professional English with business terminology and formal structure.',
+            'american_english': 'American English with US spellings, idioms, and cultural references.',
+            'british_english': 'British English with UK spellings, expressions, and formal tone.',
+            'hinglish': 'English mixed with Hindi words and phrases common in urban India.',
+            'gujlish': 'English mixed with Gujarati words and phrases popular in Gujarat.',
+            'tapori_english': 'Street-style English with Mumbai Tapori slang and attitude.'
+        };
+
         // Initialize character counts
         function initCharCounts() {
             const textAreas = [
@@ -758,7 +774,7 @@
         function updateCharCount(textAreaId, countElementId) {
             const textArea = document.getElementById(textAreaId);
             const countElement = document.getElementById(countElementId);
-            const maxChars = 1000;
+            const maxChars = 500;
             const currentChars = textArea.value.length;
             
             countElement.textContent = `${currentChars}/${maxChars}`;
@@ -772,41 +788,67 @@
             }
         }
 
-        // Context example click handlers
-        document.querySelectorAll('.context-example-item').forEach(item => {
-            item.addEventListener('click', function() {
-                const exampleNum = this.getAttribute('data-example');
-                const examples = {
-                    '1': {
-                        text: "Can we meet tomorrow to discuss the project?",
-                        context: "professional_email"
-                    },
-                    '2': {
-                        text: "I really appreciate your help with this matter.",
-                        context: "formal"
-                    },
-                    '3': {
-                        text: "You're amazing and I wanted to tell you how much you mean to me.",
-                        context: "romantic"
-                    }
-                };
+        // Load dialect options based on target language
+        function loadDialectOptions() {
+            const targetLang = document.getElementById('targetLang').value;
+            const dialectSelect = document.getElementById('dialectSelect');
+            const dialectDescription = document.getElementById('dialectDescription');
+            
+            // Clear current options
+            dialectSelect.innerHTML = '';
+            
+            if (targetLang && dialectOptions[targetLang]) {
+                // Add default option
+                const defaultOption = document.createElement('option');
+                defaultOption.value = '';
+                defaultOption.textContent = `Select ${getLanguageName(targetLang)} dialect`;
+                dialectSelect.appendChild(defaultOption);
                 
-                const example = examples[exampleNum];
-                if (example) {
-                    document.getElementById('inputText').value = example.text;
-                    document.getElementById('contextStyle').value = example.context;
-                    updateCharCount('inputText', 'inputCharCount');
-                    
-                    // Auto-translate
-                    setTimeout(() => {
-                        translateWithContext();
-                    }, 500);
-                }
-            });
-        });
+                // Add dialect options
+                dialectOptions[targetLang].forEach(dialect => {
+                    const option = document.createElement('option');
+                    option.value = dialect.value;
+                    option.textContent = dialect.label;
+                    dialectSelect.appendChild(option);
+                });
+                
+                // Clear description
+                dialectDescription.textContent = '';
+                dialectDescription.classList.remove('active');
+            } else {
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = 'Select target language first';
+                dialectSelect.appendChild(option);
+                dialectDescription.classList.remove('active');
+            }
+        }
+
+        // Show dialect description
+        function showDialectDescription(dialectValue) {
+            const description = document.getElementById('dialectDescription');
+            
+            if (dialectValue && dialectDescriptions[dialectValue]) {
+                description.textContent = dialectDescriptions[dialectValue];
+                description.classList.add('active');
+            } else {
+                description.textContent = '';
+                description.classList.remove('active');
+            }
+        }
+
+        // Get language name for display
+        function getLanguageName(code) {
+            const languages = {
+                'en': 'English',
+                'hi': 'Hindi',
+                'gu': 'Gujarati'
+            };
+            return languages[code] || code;
+        }
 
         // Main translate button
-        document.getElementById('translateBtn').addEventListener('click', translateWithContext);
+        document.getElementById('translateBtn').addEventListener('click', translateToDialect);
 
         // Clear button
         document.getElementById('clearBtn').addEventListener('click', function() {
@@ -816,13 +858,25 @@
             updateCharCount('outputText', 'outputCharCount');
         });
 
+        // Target language change handler
+        document.getElementById('targetLang').addEventListener('change', function() {
+            loadDialectOptions();
+        });
+
+        // Dialect selection change handler
+        document.getElementById('dialectSelect').addEventListener('change', function() {
+            const selectedDialect = this.value;
+            showDialectDescription(selectedDialect);
+        });
+
         // Show processing animation
         function showProcessing() {
             const overlay = document.getElementById('processingOverlay');
-            const contextStyle = document.getElementById('contextStyle').value;
-            const styleName = getContextStyleName(contextStyle);
+            const dialectSelect = document.getElementById('dialectSelect');
+            const selectedOption = dialectSelect.options[dialectSelect.selectedIndex];
+            const dialectName = selectedOption ? selectedOption.text : 'dialect';
             
-            document.getElementById('processingSubtext').textContent = `Applying ${styleName} style...`;
+            document.getElementById('processingSubtext').textContent = `Converting to ${dialectName}...`;
             overlay.classList.add('active');
         }
 
@@ -833,18 +887,24 @@
         }
 
         // Main translation function
-        async function translateWithContext() {
-            const text = document.getElementById('inputText').value.trim();
+        async function translateToDialect() {
+            const inputText = document.getElementById('inputText').value.trim();
+            const sourceLang = document.getElementById('sourceLang').value;
             const targetLang = document.getElementById('targetLang').value;
-            const contextStyle = document.getElementById('contextStyle').value;
-            console.log(text)
-            console.log(targetLang)
-            console.log(contextStyle)
-            if (!text) {
-                showToast('Please enter some text to translate', 'warning');
+            const dialectSelect = document.getElementById('dialectSelect').value;
+            
+            // Validation
+            if (!inputText) {
+                showToast('Please enter text to translate', 'warning');
+                return;
+            }
+            
+            if (!dialectSelect) {
+                showToast('Please select a dialect/variation', 'warning');
                 return;
             }
 
+            // Show loading state
             const btn = document.getElementById('translateBtn');
             const originalHTML = btn.innerHTML;
             btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
@@ -853,106 +913,39 @@
             // Show processing animation
             showProcessing();
 
-            fetch('http://localhost:8000/get_context_aware_translation', {
+            fetch('http://localhost:8000/get_indian_cultural_language_translation', {
                 method : 'POST',
-                headers : { 'Content-Type' : 'application/json' },
+                headers : {'Content-Type' : 'application/json'},
                 body : JSON.stringify({
-                    sourceText : text,
+                    inputText : inputText,
+                    inputLang : sourceLang,
                     targetLang : targetLang,
-                    sourceLang : contextStyle      
+                    targetRegion : dialectSelect
                 })
             })
             .then(res => res.json())
             .then(data => {
-                document.getElementById('outputText').value = data.translated_text;
+                document.getElementById('outputText').value = data.translated_text
                 updateCharCount('outputText', 'outputCharCount');
-                showToast('Translation complete!', 'success');
-
+                
+                showToast('Ready for API integration', 'info');
+                
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
+
                 hideProcessing();
             })
             .catch(err => console.error(err))
+
         }
 
-        // Simulate translation API call
-        function simulateTranslation(text, targetLang, contextStyle) {
+        // Simulate API call delay
+        function simulateApiCall() {
             return new Promise((resolve) => {
                 setTimeout(() => {
-                    // Generate mock translation based on context
-                    const translation = generateContextTranslation(text, targetLang, contextStyle);
-                    resolve(translation);
-                }, 2000); // 2 second delay to show animation
+                    resolve();
+                }, 1500);
             });
-        }
-
-        // Generate context-based translation
-        function generateContextTranslation(text, targetLang, contextStyle) {
-            // Base translations for different languages
-            const baseTranslations = {
-                'hi': {
-                    'casual': "क्या तुम मेरी इस डॉक्यूमेंट में मदद कर सकते हो? मुझे इसे कल तक खत्म करना है।",
-                    'formal': "क्या आप इस दस्तावेज़ में मेरी सहायता कर सकते हैं? मुझे इसे कल तक पूरा करना आवश्यक है।",
-                    'super_friendly': "भाई, इस डॉक्यूमेंट में मेरी थोड़ी सी मदद कर दो ना! कल तक तो पूरा करना ही है।",
-                    'professional_email': "प्रिय सर/मैडम,\n\nक्या आप इस दस्तावेज़ में मेरी सहायता कर सकते हैं? मुझे इसे कल तक पूरा करना आवश्यक है।\n\nधन्यवाद,\n[आपका नाम]",
-                    'romantic': "प्रिय, क्या तुम मेरी इस डॉक्यूमेंट में मदद कर सकते हो? मुझे इसे कल तक खत्म करना है, और तुम्हारी मदद से सब कुछ आसान हो जाएगा।"
-                },
-                'en': {
-                    'casual': "Hey, can you help me out with this doc? Gotta finish it by tomorrow.",
-                    'formal': "Could you please assist me with this document? I need to complete it by tomorrow.",
-                    'super_friendly': "Hey buddy! Mind giving me a hand with this document? Really need to wrap it up by tomorrow!",
-                    'professional_email': "Dear Sir/Madam,\n\nI would appreciate your assistance with this document. I need to complete it by tomorrow.\n\nThank you,\n[Your Name]",
-                    'romantic': "My love, would you be able to help me with this document? I need to finish it by tomorrow, and your help would make everything easier."
-                },
-                'gu': {
-                    'casual': "શું તમે મને આ ડોક્યુમેન્ટમાં મદદ કરી શકો છો? મારે આ કાલ સુધીમાં પૂરું કરવું છે.",
-                    'formal': "શું તમે આ દસ્તાવેજમાં મારી સહાયતા કરી શકો છો? મારે આ કાલ સુધીમાં પૂર્ણ કરવાની આવશ્યકતા છે.",
-                    'super_friendly': "ભાઈ, આ ડોક્યુમેન્ટમાં મારી થોડી મદદ કરી દેશો? કાલ સુધીમાં તો પૂરું કરવું જ છે!",
-                    'professional_email': "પ્રિય સર/મેડમ,\n\nશું તમે આ દસ્તાવેજમાં મારી સહાયતા કરી શકો છો? મારે આ કાલ સુધીમાં પૂર્ણ કરવાની આવશ્યકતા છે.\n\nઆભાર,\n[તમારું નામ]",
-                    'romantic': "પ્રિય, શું તમે મને આ ડોક્યુમેન્ટમાં મદદ કરી શકો છો? મારે આ કાલ સુધીમાં પૂરું કરવું છે, અને તમારી મદથી બધું સરળ થઈ જશે."
-                },
-                'pa': {
-                    'casual': "ਕੀ ਤੁਸੀਂ ਮੇਰੀ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਖਤਮ ਕਰਨਾ ਹੈ।",
-                    'formal': "ਕੀ ਤੁਸੀਂ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮੇਰੀ ਸਹਾਇਤਾ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਪੂਰਾ ਕਰਨ ਦੀ ਲੋੜ ਹੈ।",
-                    'super_friendly': "ਵੇ ਯਾਰ, ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮੇਰੀ ਥੋੜੀ ਜਿਹੀ ਮਦਦ ਕਰ ਦੇਵੋ! ਕੱਲ ਤੱਕ ਤਾਂ ਪੂਰਾ ਕਰਨਾ ਹੀ ਹੈ।",
-                    'professional_email': "ਪਿਆਰੇ ਸਰ/ਮੈਡਮ,\n\nਕੀ ਤੁਸੀਂ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮੇਰੀ ਸਹਾਇਤਾ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਪੂਰਾ ਕਰਨ ਦੀ ਲੋੜ ਹੈ।\n\nਧੰਨਵਾਦ,\n[ਤੁਹਾਡਾ ਨਾਮ]",
-                    'romantic': "ਪਿਆਰੇ, ਕੀ ਤੁਸੀਂ ਮੇਰੀ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਖਤਮ ਕਰਨਾ ਹੈ, ਅਤੇ ਤੁਹਾਡੀ ਮਦਦ ਨਾਲ ਸਭ ਕੁਝ ਆਸਾਨ ਹੋ ਜਾਵੇਗਾ।"
-                }
-            };
-
-            // Get the translation or show a default
-            if (baseTranslations[targetLang] && baseTranslations[targetLang][contextStyle]) {
-                return baseTranslations[targetLang][contextStyle];
-            } else if (baseTranslations[targetLang] && baseTranslations[targetLang]['casual']) {
-                return baseTranslations[targetLang]['casual'];
-            } else {
-                return `[${getContextStyleName(contextStyle)} translation to ${getLanguageName(targetLang)}]: ${text}`;
-            }
-        }
-
-        // Get context style name for display
-        function getContextStyleName(styleCode) {
-            const styles = {
-                'casual': 'Casual',
-                'formal': 'Formal',
-                'super_friendly': 'Super Friendly',
-                'professional_email': 'Professional Email',
-                'romantic': 'Romantic'
-            };
-            return styles[styleCode] || styleCode;
-        }
-
-        // Get language name for display
-        function getLanguageName(code) {
-            const languages = {
-                'en': 'English',
-                'hi': 'Hindi',
-                'gu': 'Gujarati',
-                'pa': 'Punjabi',
-                'mr': 'Marathi',
-                'bn': 'Bengali'
-            };
-            return languages[code] || code;
         }
 
         // Toast notification
@@ -1010,6 +1003,24 @@
         // Initialize on load
         document.addEventListener('DOMContentLoaded', function() {
             initCharCounts();
+            loadDialectOptions();
+            
+            // Set up initial dialect description
+            const dialectSelect = document.getElementById('dialectSelect');
+            dialectSelect.addEventListener('change', function() {
+                showDialectDescription(this.value);
+            });
+            
+            // Set up source/target language validation
+            document.getElementById('sourceLang').addEventListener('change', function() {
+                const sourceLang = this.value;
+                const targetLang = document.getElementById('targetLang').value;
+            });
+            
+            document.getElementById('targetLang').addEventListener('change', function() {
+                const targetLang = this.value;
+                const sourceLang = document.getElementById('sourceLang').value;
+            });
         });
     </script>
 </body>

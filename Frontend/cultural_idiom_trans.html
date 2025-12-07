@@ -244,20 +244,20 @@
             min-height: calc(100vh - var(--header-height));
         }
         
-        /* Context Translation Interface */
-        .context-interface {
+        /* Idiom Translation Interface */
+        .idiom-interface {
             background: white;
             border: 1px solid var(--border-color);
             border-radius: 12px;
             padding: 25px;
             margin-bottom: 30px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
         }
         
-        /* Language and Context Selection */
-        .selection-row {
+        /* Language Selection */
+        .language-selection {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
@@ -265,17 +265,17 @@
         }
         
         @media (max-width: 768px) {
-            .selection-row {
+            .language-selection {
                 grid-template-columns: 1fr;
                 gap: 15px;
             }
         }
         
-        .selection-box {
+        .language-box {
             flex: 1;
         }
         
-        .selection-box label {
+        .language-box label {
             font-weight: 600;
             margin-bottom: 8px;
             color: var(--text-primary);
@@ -283,7 +283,7 @@
             font-size: 0.95rem;
         }
         
-        .language-select, .context-select {
+        .language-select {
             width: 100%;
             padding: 12px 16px;
             border: 1px solid var(--border-color);
@@ -299,7 +299,7 @@
             background-size: 16px 12px;
         }
         
-        .language-select:focus, .context-select:focus {
+        .language-select:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
@@ -313,7 +313,7 @@
             margin-bottom: 25px;
         }
         
-        @media (max-width: 992px) {
+        @media (max-width: 768px) {
             .text-areas {
                 grid-template-columns: 1fr;
             }
@@ -333,7 +333,7 @@
         
         .text-input {
             width: 100%;
-            min-height: 200px;
+            min-height: 150px;
             padding: 16px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
@@ -462,24 +462,33 @@
             color: var(--text-secondary);
             font-size: 0.9rem;
         }
-
-        #contextStyle
-        {
-            font-weight: bold;
-        }
         
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
         
-        /* Context Examples */
-        .context-examples {
+        /* Source Language Indicator */
+        .source-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            background: #e0f2fe;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        /* Idiom Examples */
+        .idiom-examples {
             margin-top: 30px;
             padding-top: 20px;
             border-top: 1px solid var(--border-color);
         }
         
-        .context-examples-title {
+        .idiom-examples-title {
             font-weight: 600;
             margin-bottom: 15px;
             color: var(--text-primary);
@@ -488,24 +497,44 @@
             gap: 8px;
         }
         
-        .context-example-item {
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 10px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 0.9rem;
+        .idiom-examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 12px;
         }
         
-        .context-example-item:hover {
+        @media (max-width: 768px) {
+            .idiom-examples-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .idiom-example-item {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .idiom-example-item:hover {
             background: #f1f5f9;
             border-color: var(--primary-color);
+            transform: translateY(-2px);
         }
-
-        #outputText{
-            font-weight: bold;
+        
+        .idiom-text {
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+        }
+        
+        .idiom-meaning {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 500;
         }
         
         /* Responsive */
@@ -530,7 +559,7 @@
                 padding: 20px 15px;
             }
             
-            .context-interface {
+            .idiom-interface {
                 padding: 20px;
             }
         }
@@ -586,7 +615,7 @@
         <main class="main-content">
             <!-- Header -->
             <header class="main-header">
-                <h1 class="page-title" id="pageTitle">Context-Aware Translation</h1>
+                <h1 class="page-title" id="pageTitle">Cultural Idiom Translation</h1>
                 <div class="user-profile">
                     <span>Welcome, User</span>
                     <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
@@ -595,11 +624,11 @@
             
             <!-- Page Content -->
             <div class="content-wrapper" id="pageContent">
-                <!-- Context Translation Interface -->
-                <div class="context-interface">
-                    <!-- Language and Context Selection -->
-                    <div class="selection-row">
-                        <div class="selection-box">
+                <!-- Idiom Translation Interface -->
+                <div class="idiom-interface">
+                    <!-- Language Selection -->
+                    <div class="language-selection">
+                        <div class="language-box">
                             <label for="targetLang">
                                 <i class="bi bi-translate me-1"></i>
                                 Select Target Language
@@ -613,62 +642,47 @@
                                 <option value="bn">Bengali (বাংলা)</option>
                             </select>
                         </div>
-                        
-                        <div class="selection-box">
-                            <label for="contextStyle">
-                                <i class="bi bi-chat-square-text me-1"></i>
-                                Select Context Style
-                            </label>
-                            <select class="context-select" id="contextStyle">
-                                <option value="casual" selected>Casual 😎</option>
-                                <option value="formal">Formal 👔</option>
-                                <option value="super_friendly">Super Friendly 💖</option>
-                                <option value="romantic">Romantic 💏</option>
-                                <option value="inspirational">Inspirational / Motivational ❤️‍🔥</option>
-                                <option value="child">Child friendly 👧</option>
-                                <option value="angry">Angry 🤬</option>
-                                <option value="announcement">Announcement 📢</option>
-                                <option value="funny">Funny 🤣</option>
-                            </select>
-                        </div>
                     </div>
                     
                     <!-- Text Areas -->
                     <div class="text-areas">
                         <div class="text-area-container">
                             <label for="inputText">
-                                <i class="bi bi-input-cursor-text me-1"></i>
-                                Enter Text to Translate
+                                <div class="source-indicator">
+                                    <i class="bi bi-info-circle"></i>
+                                    Enter Hindi or Gujarati Idiom Only
+                                </div>
+                                <span>Enter Cultural Idiom</span>
                             </label>
                             <textarea 
                                 class="text-input" 
                                 id="inputText" 
-                                placeholder="Type or paste your text here..."
-                                rows="8"
-                            >Can you help me with this document? I need to finish it by tomorrow.</textarea>
-                            <span class="char-count" id="inputCharCount">0/1000</span>
+                                placeholder="Type or paste a Hindi or Gujarati idiom here..."
+                                rows="6"
+                            >આંખનો તારો</textarea>
+                            <span class="char-count" id="inputCharCount">0/500</span>
                         </div>
                         
                         <div class="text-area-container">
                             <label for="outputText">
                                 <i class="bi bi-translate me-1"></i>
-                                Context-Aware Translation
+                                Idiom Translation & Meaning
                             </label>
                             <textarea 
                                 class="text-input" 
                                 id="outputText" 
-                                placeholder="Translation will appear here..."
+                                placeholder="Translation and meaning will appear here..."
                                 readonly
-                                rows="8"
+                                rows="6"
                             ></textarea>
-                            <span class="char-count" id="outputCharCount">0/1000</span>
+                            <span class="char-count" id="outputCharCount">0/500</span>
                             
                             <!-- Processing Animation Overlay -->
                             <div class="processing-overlay" id="processingOverlay">
                                 <div class="processing-content">
                                     <div class="processing-spinner"></div>
-                                    <div class="processing-text">Translating with Context</div>
-                                    <div class="processing-subtext" id="processingSubtext">Applying Casual style...</div>
+                                    <div class="processing-text">Translating Cultural Idiom</div>
+                                    <div class="processing-subtext" id="processingSubtext">Analyzing cultural context...</div>
                                 </div>
                             </div>
                         </div>
@@ -678,7 +692,7 @@
                     <div class="action-buttons">
                         <button class="btn btn-primary-custom" id="translateBtn">
                             <i class="bi bi-translate"></i>
-                            Translate with Context
+                            Translate Idiom
                         </button>
                         <button class="btn btn-secondary-custom" id="clearBtn">
                             <i class="bi bi-x-circle"></i>
@@ -686,27 +700,36 @@
                         </button>
                     </div>
                     
-                    <!-- Context Examples -->
-                    <div class="context-examples">
-                        <div class="context-examples-title">
+                    <!-- Idiom Examples -->
+                    <div class="idiom-examples">
+                        <div class="idiom-examples-title">
                             <i class="bi bi-lightbulb"></i>
-                            Try Different Context Examples
+                            Try These Cultural Idioms
                         </div>
-                        <div class="row">
-                            <div class="col-md-4 mb-2">
-                                <div class="context-example-item" data-example="1">
-                                    "Can we meet tomorrow to discuss the project?"
-                                </div>
+                        <div class="idiom-examples-grid">
+                            <div class="idiom-example-item" data-example="1">
+                                <div class="idiom-text">આંખનો તારો</div>
+                                <div class="idiom-meaning">(Gujarati) Apple of one's eye</div>
                             </div>
-                            <div class="col-md-4 mb-2">
-                                <div class="context-example-item" data-example="2">
-                                    "I really appreciate your help with this matter."
-                                </div>
+                            <div class="idiom-example-item" data-example="2">
+                                <div class="idiom-text">अंधों में काना राजा</div>
+                                <div class="idiom-meaning">(Hindi) One-eyed man is king among blind</div>
                             </div>
-                            <div class="col-md-4 mb-2">
-                                <div class="context-example-item" data-example="3">
-                                    "You're amazing and I wanted to tell you how much you mean to me."
-                                </div>
+                            <div class="idiom-example-item" data-example="3">
+                                <div class="idiom-text">ઘરનો ભેદી લક્ષ્મણ</div>
+                                <div class="idiom-meaning">(Gujarati) Traitor in the house</div>
+                            </div>
+                            <div class="idiom-example-item" data-example="4">
+                                <div class="idiom-text">दाल में कुछ काला है</div>
+                                <div class="idiom-meaning">(Hindi) Something fishy is going on</div>
+                            </div>
+                            <div class="idiom-example-item" data-example="5">
+                                <div class="idiom-text">અંધારે ધીંગા ધપાવવા</div>
+                                <div class="idiom-meaning">(Gujarati) To create confusion</div>
+                            </div>
+                            <div class="idiom-example-item" data-example="6">
+                                <div class="idiom-text">हाथों हाथ लेना</div>
+                                <div class="idiom-meaning">(Hindi) To welcome warmly</div>
                             </div>
                         </div>
                     </div>
@@ -758,7 +781,7 @@
         function updateCharCount(textAreaId, countElementId) {
             const textArea = document.getElementById(textAreaId);
             const countElement = document.getElementById(countElementId);
-            const maxChars = 1000;
+            const maxChars = 500;
             const currentChars = textArea.value.length;
             
             countElement.textContent = `${currentChars}/${maxChars}`;
@@ -772,41 +795,58 @@
             }
         }
 
-        // Context example click handlers
-        document.querySelectorAll('.context-example-item').forEach(item => {
+        // Idiom example click handlers
+        document.querySelectorAll('.idiom-example-item').forEach(item => {
             item.addEventListener('click', function() {
                 const exampleNum = this.getAttribute('data-example');
                 const examples = {
                     '1': {
-                        text: "Can we meet tomorrow to discuss the project?",
-                        context: "professional_email"
+                        text: "આંખનો તારો",
+                        source: "gu",
+                        meaning: "Apple of one's eye"
                     },
                     '2': {
-                        text: "I really appreciate your help with this matter.",
-                        context: "formal"
+                        text: "अंधों में काना राजा",
+                        source: "hi",
+                        meaning: "One-eyed man is king among blind"
                     },
                     '3': {
-                        text: "You're amazing and I wanted to tell you how much you mean to me.",
-                        context: "romantic"
+                        text: "ઘરનો ભેદી લક્ષ્મણ",
+                        source: "gu",
+                        meaning: "Traitor in the house"
+                    },
+                    '4': {
+                        text: "दाल में कुछ काला है",
+                        source: "hi",
+                        meaning: "Something fishy is going on"
+                    },
+                    '5': {
+                        text: "અંધારે ધીંગા ધપાવવા",
+                        source: "gu",
+                        meaning: "To create confusion"
+                    },
+                    '6': {
+                        text: "हाथों हाथ लेना",
+                        source: "hi",
+                        meaning: "To welcome warmly"
                     }
                 };
                 
                 const example = examples[exampleNum];
                 if (example) {
                     document.getElementById('inputText').value = example.text;
-                    document.getElementById('contextStyle').value = example.context;
                     updateCharCount('inputText', 'inputCharCount');
                     
                     // Auto-translate
                     setTimeout(() => {
-                        translateWithContext();
+                        translateIdiom();
                     }, 500);
                 }
             });
         });
 
         // Main translate button
-        document.getElementById('translateBtn').addEventListener('click', translateWithContext);
+        document.getElementById('translateBtn').addEventListener('click', translateIdiom);
 
         // Clear button
         document.getElementById('clearBtn').addEventListener('click', function() {
@@ -819,10 +859,6 @@
         // Show processing animation
         function showProcessing() {
             const overlay = document.getElementById('processingOverlay');
-            const contextStyle = document.getElementById('contextStyle').value;
-            const styleName = getContextStyleName(contextStyle);
-            
-            document.getElementById('processingSubtext').textContent = `Applying ${styleName} style...`;
             overlay.classList.add('active');
         }
 
@@ -832,16 +868,43 @@
             overlay.classList.remove('active');
         }
 
+        // Detect source language (Hindi or Gujarati)
+        function detectSourceLanguage(text) {
+            // Gujarati script range: \u0A80-\u0AFF
+            const gujaratiRegex = /[\u0A80-\u0AFF]/;
+            // Hindi script range: \u0900-\u097F
+            const hindiRegex = /[\u0900-\u097F]/;
+            
+            if (gujaratiRegex.test(text)) {
+                return 'gu';
+            } else if (hindiRegex.test(text)) {
+                return 'hi';
+            } else {
+                // If no script detected, check for romanized words
+                const textLower = text.toLowerCase();
+                if (textLower.includes('aan') || textLower.includes('aa') || textLower.includes('ee')) {
+                    return 'gu'; // Common Gujarati romanizations
+                } else if (textLower.includes('ka') || textLower.includes('na') || textLower.includes('ha')) {
+                    return 'hi'; // Common Hindi romanizations
+                }
+                return null; // Could not detect
+            }
+        }
+
         // Main translation function
-        async function translateWithContext() {
+        async function translateIdiom() {
             const text = document.getElementById('inputText').value.trim();
             const targetLang = document.getElementById('targetLang').value;
-            const contextStyle = document.getElementById('contextStyle').value;
-            console.log(text)
-            console.log(targetLang)
-            console.log(contextStyle)
+            
             if (!text) {
-                showToast('Please enter some text to translate', 'warning');
+                showToast('Please enter an idiom to translate', 'warning');
+                return;
+            }
+
+            // Detect source language
+            const sourceLang = detectSourceLanguage(text);
+            if (!sourceLang || (sourceLang !== 'hi' && sourceLang !== 'gu')) {
+                showToast('Please enter a Hindi or Gujarati idiom only', 'error');
                 return;
             }
 
@@ -849,97 +912,31 @@
             const originalHTML = btn.innerHTML;
             btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
             btn.disabled = true;
-            
-            // Show processing animation
+
             showProcessing();
 
-            fetch('http://localhost:8000/get_context_aware_translation', {
+            fetch('http://localhost:8000/get_cultural_idiom_translation', {
                 method : 'POST',
                 headers : { 'Content-Type' : 'application/json' },
                 body : JSON.stringify({
                     sourceText : text,
-                    targetLang : targetLang,
-                    sourceLang : contextStyle      
+                    sourceLang : sourceLang,
+                    targetLang : targetLang
                 })
             })
             .then(res => res.json())
             .then(data => {
+                console.log(data)
                 document.getElementById('outputText').value = data.translated_text;
                 updateCharCount('outputText', 'outputCharCount');
-                showToast('Translation complete!', 'success');
-
+                showToast('Idiom translation complete!', 'success');
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
+    
                 hideProcessing();
             })
             .catch(err => console.error(err))
-        }
 
-        // Simulate translation API call
-        function simulateTranslation(text, targetLang, contextStyle) {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    // Generate mock translation based on context
-                    const translation = generateContextTranslation(text, targetLang, contextStyle);
-                    resolve(translation);
-                }, 2000); // 2 second delay to show animation
-            });
-        }
-
-        // Generate context-based translation
-        function generateContextTranslation(text, targetLang, contextStyle) {
-            // Base translations for different languages
-            const baseTranslations = {
-                'hi': {
-                    'casual': "क्या तुम मेरी इस डॉक्यूमेंट में मदद कर सकते हो? मुझे इसे कल तक खत्म करना है।",
-                    'formal': "क्या आप इस दस्तावेज़ में मेरी सहायता कर सकते हैं? मुझे इसे कल तक पूरा करना आवश्यक है।",
-                    'super_friendly': "भाई, इस डॉक्यूमेंट में मेरी थोड़ी सी मदद कर दो ना! कल तक तो पूरा करना ही है।",
-                    'professional_email': "प्रिय सर/मैडम,\n\nक्या आप इस दस्तावेज़ में मेरी सहायता कर सकते हैं? मुझे इसे कल तक पूरा करना आवश्यक है।\n\nधन्यवाद,\n[आपका नाम]",
-                    'romantic': "प्रिय, क्या तुम मेरी इस डॉक्यूमेंट में मदद कर सकते हो? मुझे इसे कल तक खत्म करना है, और तुम्हारी मदद से सब कुछ आसान हो जाएगा।"
-                },
-                'en': {
-                    'casual': "Hey, can you help me out with this doc? Gotta finish it by tomorrow.",
-                    'formal': "Could you please assist me with this document? I need to complete it by tomorrow.",
-                    'super_friendly': "Hey buddy! Mind giving me a hand with this document? Really need to wrap it up by tomorrow!",
-                    'professional_email': "Dear Sir/Madam,\n\nI would appreciate your assistance with this document. I need to complete it by tomorrow.\n\nThank you,\n[Your Name]",
-                    'romantic': "My love, would you be able to help me with this document? I need to finish it by tomorrow, and your help would make everything easier."
-                },
-                'gu': {
-                    'casual': "શું તમે મને આ ડોક્યુમેન્ટમાં મદદ કરી શકો છો? મારે આ કાલ સુધીમાં પૂરું કરવું છે.",
-                    'formal': "શું તમે આ દસ્તાવેજમાં મારી સહાયતા કરી શકો છો? મારે આ કાલ સુધીમાં પૂર્ણ કરવાની આવશ્યકતા છે.",
-                    'super_friendly': "ભાઈ, આ ડોક્યુમેન્ટમાં મારી થોડી મદદ કરી દેશો? કાલ સુધીમાં તો પૂરું કરવું જ છે!",
-                    'professional_email': "પ્રિય સર/મેડમ,\n\nશું તમે આ દસ્તાવેજમાં મારી સહાયતા કરી શકો છો? મારે આ કાલ સુધીમાં પૂર્ણ કરવાની આવશ્યકતા છે.\n\nઆભાર,\n[તમારું નામ]",
-                    'romantic': "પ્રિય, શું તમે મને આ ડોક્યુમેન્ટમાં મદદ કરી શકો છો? મારે આ કાલ સુધીમાં પૂરું કરવું છે, અને તમારી મદથી બધું સરળ થઈ જશે."
-                },
-                'pa': {
-                    'casual': "ਕੀ ਤੁਸੀਂ ਮੇਰੀ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਖਤਮ ਕਰਨਾ ਹੈ।",
-                    'formal': "ਕੀ ਤੁਸੀਂ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮੇਰੀ ਸਹਾਇਤਾ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਪੂਰਾ ਕਰਨ ਦੀ ਲੋੜ ਹੈ।",
-                    'super_friendly': "ਵੇ ਯਾਰ, ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮੇਰੀ ਥੋੜੀ ਜਿਹੀ ਮਦਦ ਕਰ ਦੇਵੋ! ਕੱਲ ਤੱਕ ਤਾਂ ਪੂਰਾ ਕਰਨਾ ਹੀ ਹੈ।",
-                    'professional_email': "ਪਿਆਰੇ ਸਰ/ਮੈਡਮ,\n\nਕੀ ਤੁਸੀਂ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮੇਰੀ ਸਹਾਇਤਾ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਪੂਰਾ ਕਰਨ ਦੀ ਲੋੜ ਹੈ।\n\nਧੰਨਵਾਦ,\n[ਤੁਹਾਡਾ ਨਾਮ]",
-                    'romantic': "ਪਿਆਰੇ, ਕੀ ਤੁਸੀਂ ਮੇਰੀ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਖਤਮ ਕਰਨਾ ਹੈ, ਅਤੇ ਤੁਹਾਡੀ ਮਦਦ ਨਾਲ ਸਭ ਕੁਝ ਆਸਾਨ ਹੋ ਜਾਵੇਗਾ।"
-                }
-            };
-
-            // Get the translation or show a default
-            if (baseTranslations[targetLang] && baseTranslations[targetLang][contextStyle]) {
-                return baseTranslations[targetLang][contextStyle];
-            } else if (baseTranslations[targetLang] && baseTranslations[targetLang]['casual']) {
-                return baseTranslations[targetLang]['casual'];
-            } else {
-                return `[${getContextStyleName(contextStyle)} translation to ${getLanguageName(targetLang)}]: ${text}`;
-            }
-        }
-
-        // Get context style name for display
-        function getContextStyleName(styleCode) {
-            const styles = {
-                'casual': 'Casual',
-                'formal': 'Formal',
-                'super_friendly': 'Super Friendly',
-                'professional_email': 'Professional Email',
-                'romantic': 'Romantic'
-            };
-            return styles[styleCode] || styleCode;
         }
 
         // Get language name for display
