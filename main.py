@@ -23,6 +23,12 @@ class RequestBody(BaseModel):
     sourceLang : str
     targetLang : str
 
+class CulturalBody(BaseModel):
+    inputLang : str
+    targetLang : str
+    targetRegion : str
+    inputText : str
+
 translator = Translator()
 
 llm = GoogleGenerativeAI(
@@ -56,6 +62,18 @@ def load_context_aware_translator():
         html_content = f.read()
     return html_content
 
+@app.get('/cultural_idiom_file', response_class=HTMLResponse)
+def load_cultural_idiom_translator():
+    with open(os.path.join('Frontend', 'cultural_idiom_trans.html'), 'r', encoding='utf-8') as f:
+        html_content = f.read()
+    return html_content
+
+@app.get('/ghar_ki_boli_wali_file', response_class=HTMLResponse)
+def ghar_ki_style_wala_translation():
+    with open(os.path.join('Frontend', 'ghar_ki_boli.html'), 'r', encoding='utf-8') as f:
+        html_content = f.read()
+    return html_content
+
 @app.post('/get_indic_translation')
 def generate_translation(req : RequestBody):
     text = req.sourceText
@@ -77,5 +95,26 @@ def generate_context_aware_translation(req : RequestBody):
     chain = template_b | llm | output_parser
 
     response = chain.invoke({ 'user_input' : user_input, 'target_language' : target_language , 'context_style' : context_style })
+
+    return response
+
+@app.post('/get_cultural_idiom_translation')
+def cultural_idiom_translation(req : RequestBody):
+    text, target_language, source_language = req.sourceText, req.targetLang, req.sourceLang
+
+    chain = template_c | llm | output_parser
+    response = chain.invoke({ 'input_text' : text, 'input_language' : source_language, 'target_language' : target_language })
+    return response
+
+@app.post('/get_indian_cultural_language_translation')
+def get_ghar_ka_translation(req : CulturalBody):
+    text = req.inputText
+    inp_lang = req.inputLang
+    tar_lang = req.targetLang
+    tar_reg = req.targetRegion
+
+    chain = template_d | llm | output_parser
+
+    response = chain.invoke({'input_language' : inp_lang, 'target_language' : tar_lang, 'target_region' : tar_reg, 'input_text' : text})
 
     return response

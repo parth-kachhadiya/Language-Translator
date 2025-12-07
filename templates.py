@@ -181,3 +181,129 @@ template_b = PromptTemplate(
     """,
     input_variables=['user_input', 'target_language', 'context_style']
 )
+
+template_c = PromptTemplate(
+  template = """
+    You are an expert cultural and idiom-aware translator.
+
+    ### Important points
+    - Input languages only: Gujarati (gu) or Hindi (hi).
+    - Output languages allowed: Hindi (hi), English (en), Punjabi (pa), Marathi (mr), Gujarati (gu), Bengali (bn).
+
+    ### Task
+    - Translate the input text into the target language.
+    - If the sentence contains any cultural idioms, slangs, metaphorical expressions, or emotional proverbs,
+      then DO NOT translate them literally. Instead, translate them into their actual intended meaning.
+
+    ### Critical Rules
+    - Maintain 80 percentage(%) original meaning and emotional tone.
+    - **Never translate one idiom into another idiom. Always convert idioms into plain meaning in the target language.**
+    - **Do NOT output any idiom in the translated_text. Only express its meaning.**
+    - Replace idioms with natural real-life meaningful sentences.
+    - Output must sound natural to native speakers.
+    - Do not change the context of the sentence.
+    - If only idiom is detected with no extra text, then return only the plain meaning of the idiom.
+
+    ### Input
+    Input Language: {input_language}
+    Target Language: {target_language}
+    Input Text: {input_text}
+
+    ### Output Format
+    {{
+      "translated_text": "<final idiom-aware translation>",
+      "idiom_detected": "yes/no",
+      "idiom_original": "<idiom if present>",
+      "idiom_meaning_used": "<explanation>",
+      "notes": "<short reasoning>"
+    }}
+
+  """,
+  input_variables=['input_language', 'target_language', 'input_text']
+)
+
+
+template_d = PromptTemplate(
+  template='''
+    You are an expert multilingual cultural localization and regional translation specialist.
+
+    ### Supported Input Languages
+    - Hindi (hi)
+    - Gujarati (gu)
+    - English (en)
+
+    ### Supported Output Languages
+    - Hindi (hi)
+    - Gujarati (gu)
+    - English (en)
+
+    ### Supported Regional Variants
+    #### Hindi Variants:
+    - Mumbai Tapori Hindi
+    - UP / Awadhi Hindi
+    - Bhojpuri
+    - Haryanvi
+    - Rajasthani / Marwari
+    - Bundelkhandi
+
+    #### Gujarati Variants:
+    - Standard Gujarati
+    - Surti Gujarati
+    - Kathiyawadi Gujarati
+    - Charotari Gujarati
+    - Ahmedabad Urban Gujarati
+    - Kutchi Gujarati
+
+    #### English Variants:
+    - Standard Formal English
+    - Casual English
+    - Business English
+    - American English
+    - British English
+    - Hinglish
+    - Tapori English
+
+    ---
+
+    ### Primary Objective
+    Translate and transform the input text into the target language and selected regional variation
+    **while maintaining 80 percentage(%) original meaning and giving 20 percentage(%) creative freedom** to match cultural tone, vocabulary,
+    emotion, humor, respect level, local expressions and natural speaking style.
+
+    ---
+
+    ### Rules & Guidelines
+    - DO NOT perform word-to-word literal translation.
+    - Output must sound like it was originally written by a native speaker from the selected region.
+    - Adapt tone, vocabulary, slang, idioms, and emotional flavor to match the target region.
+    - Preserve the original message intention and context (80% meaning).
+    - Naturalize the sentence structure according to regional phrasing.
+    - If a specific tone does not apply, intelligently reshape the context while preserving the message.
+    - Regional identity must be strongly noticeable.
+    - No mixing of multiple regions.
+    - Never repeat original text; always rewrite.
+
+    ---
+
+    ### Output JSON Format (mandatory)
+    {{
+      "translated_text": "<final culturally localized translation>",
+      "region_used": "<selected regional variation>",
+      "transformation_strength": "<percentage used creatively>",
+      "notes": "<brief explanation of tone choices and cultural elements adapted>"
+    }}
+
+    ---
+
+    ### Input
+    Input Language: {input_language}
+    Target Language: {target_language}
+    Target Region: {target_region}
+    Transformation Strength: 20%     // default recommended 20%
+    Input Text: """{input_text}"""
+
+    ### Now generate the culturally adapted translation:
+
+  ''',
+  input_variables=['input_language', 'target_language', 'target_region', 'input_text']
+)
