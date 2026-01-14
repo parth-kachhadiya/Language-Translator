@@ -6,13 +6,9 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 
 from langchain_google_genai import GoogleGenerativeAI
-from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 
 import os
-
-from googletrans import Translator
-from aksharamukha.transliterate import process
 
 from templates import *
 
@@ -29,7 +25,6 @@ class CulturalBody(BaseModel):
     targetRegion : str
     inputText : str
 
-translator = Translator()
 
 llm = GoogleGenerativeAI(
     model = "gemini-2.5-flash",
@@ -74,16 +69,18 @@ def ghar_ki_style_wala_translation():
         html_content = f.read()
     return html_content
 
+@app.get('/_arth_engine', response_class=HTMLResponse)
+def load_arth_engline():
+    with open(os.path.join('Frontend', 'arth_engine.html'), 'r', encoding='utf-8') as f:
+        html_content = f.read()
+    return html_content
+
 @app.post('/get_indic_translation')
 def generate_translation(req : RequestBody):
     text = req.sourceText
     target_lang = req.targetLang
-    print(f"Text : {text}\nTarget Language Code : {target_lang}")
-
     chain = template_a | llm | output_parser
-
     result_obj = chain.invoke({ 'input_text' : text, 'target_language' : target_lang })
-
     return result_obj
 
 @app.post('/get_context_aware_translation')
@@ -91,17 +88,13 @@ def generate_context_aware_translation(req : RequestBody):
     user_input = req.sourceText
     target_language = req.targetLang
     context_style = req.sourceLang
-
     chain = template_b | llm | output_parser
-
     response = chain.invoke({ 'user_input' : user_input, 'target_language' : target_language , 'context_style' : context_style })
-
     return response
 
 @app.post('/get_cultural_idiom_translation')
 def cultural_idiom_translation(req : RequestBody):
     text, target_language, source_language = req.sourceText, req.targetLang, req.sourceLang
-
     chain = template_c | llm | output_parser
     response = chain.invoke({ 'input_text' : text, 'input_language' : source_language, 'target_language' : target_language })
     return response
@@ -112,9 +105,14 @@ def get_ghar_ka_translation(req : CulturalBody):
     inp_lang = req.inputLang
     tar_lang = req.targetLang
     tar_reg = req.targetRegion
-
     chain = template_d | llm | output_parser
-
     response = chain.invoke({'input_language' : inp_lang, 'target_language' : tar_lang, 'target_region' : tar_reg, 'input_text' : text})
+    return response
 
+@app.post('/analyze_mantra')
+def get_arth_kavita_result(req : CulturalBody):
+    mantra = req.inputText
+    targetLang = req.targetLang
+    chain = template_e | llm | output_parser
+    response = chain.invoke({'input_text' : mantra , 'target_language' : targetLang})
     return response

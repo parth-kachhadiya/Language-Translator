@@ -581,7 +581,7 @@
             
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="http://localhost:8000/cultural_idiom_file" class="nav-link" data-page="idiom">
+                    <a href="http://localhost:8000/cultural_idiom_file" class="nav-link active" data-page="idiom">
                         <i class="bi bi-translate nav-icon"></i>
                         <span class="nav-text">Cultural Idioms</span>
                     </a>
@@ -593,15 +593,21 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="http://localhost:8000/" class="nav-link active" data-page="code-mixed">
+                    <a href="http://localhost:8000/" class="nav-link" data-page="code-mixed">
                         <i class="bi bi-code-slash nav-icon"></i>
                         <span class="nav-text">Code-Mixed</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="http://localhost:8000/ghar_ki_boli_wali_file" class="nav-link active" data-page="ghar-ki-boli">
+                    <a href="http://localhost:8000/ghar_ki_boli_wali_file" class="nav-link" data-page="ghar-ki-boli">
                         <i class="bi bi-house-door nav-icon"></i>
                         <span class="nav-text">Ghar Ki Boli</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="http://localhost:8000/_arth_engine" class="nav-link" data-page="ghar-ki-boli">
+                        <i class="bi bi-gear nav-icon"></i>
+                        <span class="nav-text">Arth Engine</span>
                     </a>
                 </li>
             </ul>
@@ -803,32 +809,26 @@
                     '1': {
                         text: "આંખનો તારો",
                         source: "gu",
-                        meaning: "Apple of one's eye"
                     },
                     '2': {
                         text: "अंधों में काना राजा",
                         source: "hi",
-                        meaning: "One-eyed man is king among blind"
                     },
                     '3': {
                         text: "ઘરનો ભેદી લક્ષ્મણ",
                         source: "gu",
-                        meaning: "Traitor in the house"
                     },
                     '4': {
                         text: "दाल में कुछ काला है",
                         source: "hi",
-                        meaning: "Something fishy is going on"
                     },
                     '5': {
                         text: "અંધારે ધીંગા ધપાવવા",
                         source: "gu",
-                        meaning: "To create confusion"
                     },
                     '6': {
                         text: "हाथों हाथ लेना",
                         source: "hi",
-                        meaning: "To welcome warmly"
                     }
                 };
                 
@@ -837,7 +837,6 @@
                     document.getElementById('inputText').value = example.text;
                     updateCharCount('inputText', 'inputCharCount');
                     
-                    // Auto-translate
                     setTimeout(() => {
                         translateIdiom();
                     }, 500);

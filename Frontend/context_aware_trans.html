@@ -558,21 +558,27 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="http://localhost:8000/context_aware_file" class="nav-link">
+                    <a href="http://localhost:8000/context_aware_file" class="nav-link active">
                         <i class="bi bi-text-paragraph nav-icon"></i>
                         <span class="nav-text">Context-Aware</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="http://localhost:8000/" class="nav-link active" data-page="code-mixed">
+                    <a href="http://localhost:8000/" class="nav-link" data-page="code-mixed">
                         <i class="bi bi-code-slash nav-icon"></i>
                         <span class="nav-text">Code-Mixed</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="http://localhost:8000/ghar_ki_boli_wali_file" class="nav-link active" data-page="ghar-ki-boli">
+                    <a href="http://localhost:8000/ghar_ki_boli_wali_file" class="nav-link" data-page="ghar-ki-boli">
                         <i class="bi bi-house-door nav-icon"></i>
                         <span class="nav-text">Ghar Ki Boli</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="http://localhost:8000/_arth_engine" class="nav-link" data-page="ghar-ki-boli">
+                        <i class="bi bi-gear nav-icon"></i>
+                        <span class="nav-text">Arth Engine</span>
                     </a>
                 </li>
             </ul>
@@ -779,7 +785,7 @@
                 const examples = {
                     '1': {
                         text: "Can we meet tomorrow to discuss the project?",
-                        context: "professional_email"
+                        context: "funny"
                     },
                     '2': {
                         text: "I really appreciate your help with this matter.",
@@ -875,69 +881,18 @@
             .catch(err => console.error(err))
         }
 
-        // Simulate translation API call
-        function simulateTranslation(text, targetLang, contextStyle) {
-            return new Promise((resolve) => {
-                setTimeout(() => {
-                    // Generate mock translation based on context
-                    const translation = generateContextTranslation(text, targetLang, contextStyle);
-                    resolve(translation);
-                }, 2000); // 2 second delay to show animation
-            });
-        }
-
-        // Generate context-based translation
-        function generateContextTranslation(text, targetLang, contextStyle) {
-            // Base translations for different languages
-            const baseTranslations = {
-                'hi': {
-                    'casual': "क्या तुम मेरी इस डॉक्यूमेंट में मदद कर सकते हो? मुझे इसे कल तक खत्म करना है।",
-                    'formal': "क्या आप इस दस्तावेज़ में मेरी सहायता कर सकते हैं? मुझे इसे कल तक पूरा करना आवश्यक है।",
-                    'super_friendly': "भाई, इस डॉक्यूमेंट में मेरी थोड़ी सी मदद कर दो ना! कल तक तो पूरा करना ही है।",
-                    'professional_email': "प्रिय सर/मैडम,\n\nक्या आप इस दस्तावेज़ में मेरी सहायता कर सकते हैं? मुझे इसे कल तक पूरा करना आवश्यक है।\n\nधन्यवाद,\n[आपका नाम]",
-                    'romantic': "प्रिय, क्या तुम मेरी इस डॉक्यूमेंट में मदद कर सकते हो? मुझे इसे कल तक खत्म करना है, और तुम्हारी मदद से सब कुछ आसान हो जाएगा।"
-                },
-                'en': {
-                    'casual': "Hey, can you help me out with this doc? Gotta finish it by tomorrow.",
-                    'formal': "Could you please assist me with this document? I need to complete it by tomorrow.",
-                    'super_friendly': "Hey buddy! Mind giving me a hand with this document? Really need to wrap it up by tomorrow!",
-                    'professional_email': "Dear Sir/Madam,\n\nI would appreciate your assistance with this document. I need to complete it by tomorrow.\n\nThank you,\n[Your Name]",
-                    'romantic': "My love, would you be able to help me with this document? I need to finish it by tomorrow, and your help would make everything easier."
-                },
-                'gu': {
-                    'casual': "શું તમે મને આ ડોક્યુમેન્ટમાં મદદ કરી શકો છો? મારે આ કાલ સુધીમાં પૂરું કરવું છે.",
-                    'formal': "શું તમે આ દસ્તાવેજમાં મારી સહાયતા કરી શકો છો? મારે આ કાલ સુધીમાં પૂર્ણ કરવાની આવશ્યકતા છે.",
-                    'super_friendly': "ભાઈ, આ ડોક્યુમેન્ટમાં મારી થોડી મદદ કરી દેશો? કાલ સુધીમાં તો પૂરું કરવું જ છે!",
-                    'professional_email': "પ્રિય સર/મેડમ,\n\nશું તમે આ દસ્તાવેજમાં મારી સહાયતા કરી શકો છો? મારે આ કાલ સુધીમાં પૂર્ણ કરવાની આવશ્યકતા છે.\n\nઆભાર,\n[તમારું નામ]",
-                    'romantic': "પ્રિય, શું તમે મને આ ડોક્યુમેન્ટમાં મદદ કરી શકો છો? મારે આ કાલ સુધીમાં પૂરું કરવું છે, અને તમારી મદથી બધું સરળ થઈ જશે."
-                },
-                'pa': {
-                    'casual': "ਕੀ ਤੁਸੀਂ ਮੇਰੀ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਖਤਮ ਕਰਨਾ ਹੈ।",
-                    'formal': "ਕੀ ਤੁਸੀਂ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮੇਰੀ ਸਹਾਇਤਾ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਪੂਰਾ ਕਰਨ ਦੀ ਲੋੜ ਹੈ।",
-                    'super_friendly': "ਵੇ ਯਾਰ, ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮੇਰੀ ਥੋੜੀ ਜਿਹੀ ਮਦਦ ਕਰ ਦੇਵੋ! ਕੱਲ ਤੱਕ ਤਾਂ ਪੂਰਾ ਕਰਨਾ ਹੀ ਹੈ।",
-                    'professional_email': "ਪਿਆਰੇ ਸਰ/ਮੈਡਮ,\n\nਕੀ ਤੁਸੀਂ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮੇਰੀ ਸਹਾਇਤਾ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਪੂਰਾ ਕਰਨ ਦੀ ਲੋੜ ਹੈ।\n\nਧੰਨਵਾਦ,\n[ਤੁਹਾਡਾ ਨਾਮ]",
-                    'romantic': "ਪਿਆਰੇ, ਕੀ ਤੁਸੀਂ ਮੇਰੀ ਇਸ ਦਸਤਾਵੇਜ਼ ਵਿੱਚ ਮਦਦ ਕਰ ਸਕਦੇ ਹੋ? ਮੈਨੂੰ ਇਸਨੂੰ ਕੱਲ ਤੱਕ ਖਤਮ ਕਰਨਾ ਹੈ, ਅਤੇ ਤੁਹਾਡੀ ਮਦਦ ਨਾਲ ਸਭ ਕੁਝ ਆਸਾਨ ਹੋ ਜਾਵੇਗਾ।"
-                }
-            };
-
-            // Get the translation or show a default
-            if (baseTranslations[targetLang] && baseTranslations[targetLang][contextStyle]) {
-                return baseTranslations[targetLang][contextStyle];
-            } else if (baseTranslations[targetLang] && baseTranslations[targetLang]['casual']) {
-                return baseTranslations[targetLang]['casual'];
-            } else {
-                return `[${getContextStyleName(contextStyle)} translation to ${getLanguageName(targetLang)}]: ${text}`;
-            }
-        }
-
         // Get context style name for display
         function getContextStyleName(styleCode) {
             const styles = {
                 'casual': 'Casual',
                 'formal': 'Formal',
                 'super_friendly': 'Super Friendly',
-                'professional_email': 'Professional Email',
-                'romantic': 'Romantic'
+                'inspirational': 'Inspirational',
+                'romantic': 'Romantic',
+                'child' : 'Child Friendly',
+                'angry' : 'Angry',
+                'announcement' : 'Announcement',
+                'funny' : 'Funny'
             };
             return styles[styleCode] || styleCode;
         }

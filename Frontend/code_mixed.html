@@ -630,7 +630,7 @@
             border-bottom: none;
         }
 
-        #translatedOutputText{
+        #translatedOutputText {
             font-weight: bold;
         }
 
@@ -708,9 +708,15 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="http://localhost:8000/ghar_ki_boli_wali_file" class="nav-link active" data-page="ghar-ki-boli">
+                    <a href="http://localhost:8000/ghar_ki_boli_wali_file" class="nav-link" data-page="ghar-ki-boli">
                         <i class="bi bi-house-door nav-icon"></i>
                         <span class="nav-text">Ghar Ki Boli</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="http://localhost:8000/_arth_engine" class="nav-link" data-page="ghar-ki-boli">
+                        <i class="bi bi-gear nav-icon"></i>
+                        <span class="nav-text">Arth Engine</span>
                     </a>
                 </li>
             </ul>
@@ -1004,6 +1010,54 @@
             }
         }
 
+        // Show processing spinner
+        function showProcessingSpinner() {
+            const outputTextarea = document.getElementById('translatedOutputText');
+            const outputCharCount = document.getElementById('outputCharCount');
+
+            outputTextarea.value = '';
+            outputTextarea.style.background = '#f8fafc';
+            outputTextarea.style.position = 'relative';
+
+            // Create spinner container
+            let spinnerContainer = document.getElementById('processingSpinner');
+            if (!spinnerContainer) {
+                spinnerContainer = document.createElement('div');
+                spinnerContainer.id = 'processingSpinner';
+                spinnerContainer.innerHTML = `
+                    <div class="processing-animation">
+                        <div class="spinner"></div>
+                        <div>Detecting languages and translating...</div>
+                    </div>
+                `;
+                spinnerContainer.style.position = 'absolute';
+                spinnerContainer.style.top = '50%';
+                spinnerContainer.style.left = '50%';
+                spinnerContainer.style.transform = 'translate(-50%, -50%)';
+                spinnerContainer.style.width = '100%';
+                spinnerContainer.style.textAlign = 'center';
+                spinnerContainer.style.pointerEvents = 'none';
+                spinnerContainer.style.zIndex = '10';
+                outputTextarea.parentElement.style.position = 'relative';
+                outputTextarea.parentElement.appendChild(spinnerContainer);
+            } else {
+                spinnerContainer.style.display = 'block';
+            }
+
+            outputCharCount.textContent = 'Processing...';
+        }
+
+        // Hide processing spinner
+        function hideProcessingSpinner() {
+            const spinnerContainer = document.getElementById('processingSpinner');
+            if (spinnerContainer) {
+                spinnerContainer.style.display = 'none';
+            }
+
+            const outputTextarea = document.getElementById('translatedOutputText');
+            outputTextarea.style.background = '';
+        }
+
         // Example click handlers
         document.querySelectorAll('.example-item').forEach(item => {
             item.addEventListener('click', function () {
@@ -1050,6 +1104,9 @@
 
             // Reset server response display
             resetServerResponse();
+
+            // Hide spinner if visible
+            hideProcessingSpinner();
         });
 
         // Speak output button
@@ -1073,7 +1130,6 @@
             document.getElementById('processedText').textContent = 'Enter text to see processed output';
             document.getElementById('processingNotes').textContent = 'Enter mixed language text to see analysis notes';
             document.getElementById('confidenceBadge').textContent = 'Confidence: 0%';
-
         }
 
         // Main function to detect and translate
@@ -1086,174 +1142,125 @@
                 return;
             }
 
-            // Show loading state
+            // Show processing spinner
+            showProcessingSpinner();
+
+            // Show loading state on button
             const btn = document.getElementById('translateMixedBtn');
             const originalHTML = btn.innerHTML;
             btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Processing...';
             btn.disabled = true;
 
+            // Update server response UI to show processing
             document.getElementById('conversionStatus').textContent = 'Processing...';
             document.getElementById('confidenceBadge').textContent = 'Confidence: Analyzing...';
+            document.getElementById('detectedLanguage').textContent = 'Detecting...';
+            document.getElementById('detectedScript').textContent = 'Analyzing...';
+            document.getElementById('processedText').textContent = 'Processing your text...';
+            document.getElementById('processingNotes').textContent = 'Analyzing mixed language patterns...';
 
             try {
-                
-                fetch('http://localhost:8000/get_indic_translation', {
-                    method : 'POST',
-                    headers : { 'Content-Type' : 'application/json'},
-                    body : JSON.stringify({
-                        sourceText : l_text,
-                        sourceLang : 'auto',
-                        targetLang : targetLang
+                // Call backend API
+                const response = await fetch('http://localhost:8000/get_indic_translation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sourceText: l_text,
+                        sourceLang: 'auto',
+                        targetLang: targetLang
                     })
-                })
-                .then(res => res.json())
-                .then(result => {
-                    updateServerResponseUI(result);
-                    document.getElementById('translatedOutputText').value = result.converted_text ||
-                        `Translated to ${getFullLanguageName(targetLang)}: ${l_text}`;
-                    updateCharCount('translatedOutputText', 'outputCharCount');
-                    showToast('Translation complete!', 'success');
-                })
-                .catch(err => console.error(err))
-            } catch (error) {
-                showToast('Error processing translation', 'error');
-                console.error('Translation error:', error);
+                });
 
-                updateServerResponseUI(generateFallbackResponse(text));
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+
+                // Update UI with backend response
+                updateServerResponseUI(result);
+
+                // Set translated text from backend response
+                document.getElementById('translatedOutputText').value = result.translated_text ||
+                    result.converted_text ||
+                    'Translation not available';
+
+                updateCharCount('translatedOutputText', 'outputCharCount');
+                showToast('Translation complete!', 'success');
+
+            } catch (error) {
+                console.error('Translation error:', error);
+                showToast('Error processing translation. Please try again.', 'error');
+
+                // Show error in output
+                document.getElementById('translatedOutputText').value = 'Translation failed. Please try again.';
+                document.getElementById('conversionStatus').textContent = 'Failed';
+                document.getElementById('confidenceBadge').textContent = 'Confidence: 0%';
+                document.getElementById('detectedLanguage').textContent = 'Error';
+                document.getElementById('detectedScript').textContent = 'Error';
+                document.getElementById('processedText').textContent = 'Failed to process text';
+                document.getElementById('processingNotes').textContent = 'Error connecting to translation service';
+
             } finally {
+                // Hide processing spinner
+                hideProcessingSpinner();
+
                 // Restore button
                 btn.innerHTML = originalHTML;
                 btn.disabled = false;
             }
         }
 
-        // Generate mock server response
-        function generateMockServerResponse(text, targetLang) {
-            // Analyze text to determine type
-            const textLower = text.toLowerCase();
-            let detectedType = 'gujlish';
-            let primaryLang = 'gujarati';
-
-            if (textLower.includes('kal') || textLower.includes('hai') || textLower.includes('karna')) {
-                detectedType = 'hinglish';
-                primaryLang = 'hindi';
-            } else if (textLower.includes('achhi') || textLower.includes('korbe')) {
-                detectedType = 'benglish';
-                primaryLang = 'bengali';
-            } else if (text.includes('ਹੈ') || text.includes('ਕਰਨਾ')) {
-                detectedType = 'punjlish';
-                primaryLang = 'punjabi';
-            } else if (textLower.includes('ahe') || textLower.includes('kar')) {
-                detectedType = 'minglish';
-                primaryLang = 'marathi';
-            }
-
-            // Generate detection confidence
-            const confidence = Math.floor(Math.random() * 20) + 70; // 70-90%
-
-            // Generate languages detected
-            const languagesDetected = [
-                { language: primaryLang, confidence: Math.floor(Math.random() * 15) + 80 },
-                { language: 'english', confidence: Math.floor(Math.random() * 15) + 85 }
-            ];
-
-            // Generate processed text
-            const processedText = processMixedText(text, detectedType);
-
-            // Generate translation
-            const translation = generateTranslation(text, targetLang, detectedType);
-
-            return {
-                detected_language: "mixed",
-                detected_script: primaryLang,
-                converted_text: processedText,
-                notes: `Mixed ${primaryLang}-English text detected. English parts converted to ${primaryLang} script where applicable.`,
-                detection_confidence: confidence,
-                languages_detected: languagesDetected,
-                translated_text: translation
-            };
-        }
-
-        // Generate fallback response
-        function generateFallbackResponse(text) {
-            return {
-                detected_language: "mixed",
-                detected_script: "multiple",
-                converted_text: text,
-                notes: "Text analysis completed. Mixed language patterns detected.",
-                detection_confidence: 65,
-                languages_detected: [
-                    { language: "english", confidence: 85 },
-                    { language: "hindi", confidence: 70 }
-                ],
-                translated_text: `Translated: ${text}`
-            };
-        }
-
-        // Process mixed text
-        function processMixedText(text, type) {
-            const processors = {
-                'gujlish': (t) => `આઈ વિલ બી ધેઅર ${t.includes('meeting') ? 'મીટિંગ માટે' : ''}`,
-                'hinglish': (t) => `कल मीटिंग महत्वपूर्ण है, कृपया उपस्थित रहें`,
-                'benglish': (t) => `আজ অফিসে ব্যস্ত আছি, কল করবেন না?`,
-                'punjlish': (t) => `ਕਲ ਮੀਟਿੰਗ ਜ਼ਰੂਰੀ ਹੈ, ਕਿਰਪਾ ਕਰਕੇ ਸ਼ਾਮਲ ਹੋਵੋ`,
-                'minglish': (t) => `उद्या मीटिंग महत्त्वाची आहे, कृपया हजर राहा`,
-                'default': (t) => t
-            };
-
-            return processors[type] ? processors[type](text) : processors['default'](text);
-        }
-
-        // Generate translation
-        function generateTranslation(text, targetLang, type) {
-            const translations = {
-                'en': {
-                    'gujlish': "I will be there for the meeting.",
-                    'hinglish': "Tomorrow's meeting is important, please attend.",
-                    'benglish': "I am busy in the office today, will you call?",
-                    'punjlish': "Tomorrow's meeting is important, please attend.",
-                    'minglish': "Tomorrow's meeting is important, please be present.",
-                    'default': "Mixed language text translated to English."
-                },
-                'hi': {
-                    'gujlish': "मैं बैठक के लिए वहाँ उपस्थित रहूँगा।",
-                    'hinglish': "कल की मीटिंग महत्वपूर्ण है, कृपया उपस्थित रहें।",
-                    'benglish': "मैं आज ऑफिस में व्यस्त हूँ, क्या आप कॉल करेंगे?",
-                    'default': "मिश्रित भाषा पाठ का हिंदी में अनुवाद।"
-                },
-                'gu': {
-                    'gujlish': "હું મીટિંગ માટે ત્યાં હઈશ.",
-                    'hinglish': "કાલની મીટિંગ મહત્વપૂર્ણ છે, મહેરબાની કરીને હાજર રહો.",
-                    'default': "મિશ્રિત ભાષાના લેખનો ગુજરાતીમાં અનુવાદ."
-                },
-                'pa': {
-                    'gujlish': "ਮੈਂ ਮੀਟਿੰਗ ਲਈ ਉੱਥੇ ਹੋਵਾਂਗਾ।",
-                    'default': "ਮਿਸ਼ਰਤ ਭਾਸ਼ਾ ਦੇ ਟੈਕਸਟ ਦਾ ਪੰਜਾਬੀ ਵਿੱਚ ਅਨੁਵਾਦ।"
-                },
-                'mr': {
-                    'gujlish': "मी बैठकीसाठी तिथे असेन.",
-                    'default': "मिश्र भाषेच्या मजकुराचा मराठीत अनुवाद."
-                },
-                'bn': {
-                    'gujlish': "আমি সভার জন্য সেখানে উপস্থিত থাকব।",
-                    'default': "মিশ্র ভাষার পাঠ্য বাংলায় অনুবাদ করা হয়েছে।"
-                }
-            };
-
-            return translations[targetLang]?.[type] ||
-                translations[targetLang]?.['default'] ||
-                translations['en']['default'];
-        }
-
         // Update server response UI
         function updateServerResponseUI(response) {
-            // Update basic fields
-            document.getElementById('detectedLanguage').textContent = response.detected_language;
-            document.getElementById('detectedScript').textContent = capitalizeFirst(response.detected_script);
-            document.getElementById('conversionStatus').textContent = 'Converted Successfully';
-            document.getElementById('processedText').textContent = response.converted_text;
-            document.getElementById('processingNotes').textContent = response.notes;
-            document.getElementById('confidenceBadge').textContent = `Confidence: ${response.detection_confidence}%`;
+            // Update basic fields from backend response
+            document.getElementById('detectedLanguage').textContent = response.detected_language || 'mixed';
+            document.getElementById('detectedScript').textContent = capitalizeFirst(response.detected_script || 'multiple');
+            document.getElementById('conversionStatus').textContent = response.translated_text ? 'Converted Successfully' : 'Processed';
+            document.getElementById('processedText').textContent = response.converted_text || response.sourceText || 'No processed text available';
+            document.getElementById('processingNotes').textContent = response.notes || 'Text processed successfully';
+            document.getElementById('confidenceBadge').textContent = `Confidence: ${response.detection_confidence || 0}%`;
+
+            // Update language detection grid if available
+            if (response.languages_detected && Array.isArray(response.languages_detected)) {
+                updateLanguageDetectionGrid(response.languages_detected);
+            }
+        }
+
+        // Update language detection grid
+        function updateLanguageDetectionGrid(languages) {
+            const gridContainer = document.getElementById('languageDetectionGrid');
+            if (!gridContainer) {
+                // Create grid container if it doesn't exist
+                const newGrid = document.createElement('div');
+                newGrid.id = 'languageDetectionGrid';
+                newGrid.className = 'language-detection-grid mt-3';
+
+                // Insert after processed text section
+                const processedTextDiv = document.getElementById('processedText').parentElement;
+                processedTextDiv.parentElement.appendChild(newGrid);
+
+                languages.forEach(lang => {
+                    const langElement = document.createElement('div');
+                    langElement.className = 'language-tag-detected';
+                    langElement.innerHTML = `
+                        <div class="language-name">${getFullLanguageName(lang.language)}</div>
+                        <div class="confidence-score">${lang.confidence || 0}%</div>
+                    `;
+                    newGrid.appendChild(langElement);
+                });
+            } else {
+                gridContainer.innerHTML = '';
+                languages.forEach(lang => {
+                    const langElement = document.createElement('div');
+                    langElement.className = 'language-tag-detected';
+                    langElement.innerHTML = `
+                        <div class="language-name">${getFullLanguageName(lang.language)}</div>
+                        <div class="confidence-score">${lang.confidence || 0}%</div>
+                    `;
+                    gridContainer.appendChild(langElement);
+                });
+            }
         }
 
         // Get full language name
@@ -1265,19 +1272,14 @@
                 'pa': 'Punjabi',
                 'mr': 'Marathi',
                 'bn': 'Bengali',
-                'mixed': 'Mixed',
-                'hindi': 'Hindi',
-                'gujarati': 'Gujarati',
-                'punjabi': 'Punjabi',
-                'marathi': 'Marathi',
-                'bengali': 'Bengali',
-                'english': 'English'
+                'mixed': 'Mixed'
             };
-            return languages[code] || code;
+            return languages[code] || code.charAt(0).toUpperCase() + code.slice(1);
         }
 
         // Capitalize first letter
         function capitalizeFirst(string) {
+            if (!string) return '';
             return string.charAt(0).toUpperCase() + string.slice(1);
         }
 

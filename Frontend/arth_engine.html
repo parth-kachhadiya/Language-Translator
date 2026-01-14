@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mantra Arth - PolyGlot</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary-color: #7c3aed;
+            --accent-color: #06b6d4;
+            --sidebar-bg: #1e293b;
+            --sidebar-hover: #334155;
+            --sidebar-active: #0f172a;
+            --sidebar-text: #cbd5e1;
+            --card-bg: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --sidebar-width: 260px;
+            --sidebar-collapsed: 70px;
+            --header-height: 70px;
+            --mantra-color: #0ea5e9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: var(--text-primary);
+            height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Parent Layout */
+        .layout-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            position: fixed;
+            height: 100vh;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+
+        .sidebar-header {
+            height: var(--header-height);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: white;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-text {
+            transition: opacity 0.3s ease;
+            font-size: 1.2rem;
+        }
+
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            flex: 1;
+            padding: 20px 0;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            margin: 4px 12px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            background: var(--sidebar-hover);
+            color: white;
+            transform: translateX(2px);
+        }
+
+        .nav-link.active {
+            background: var(--sidebar-active);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-link.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 60%;
+            background: var(--accent-color);
+            border-radius: 0 2px 2px 0;
+        }
+
+        .nav-icon {
+            font-size: 1.2rem;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .nav-text {
+            transition: opacity 0.3s ease;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .sidebar.collapsed .nav-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+        }
+
+        /* Sidebar Toggle */
+        .sidebar-toggle {
+            margin: 20px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.05);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .sidebar.collapsed~.main-content {
+            margin-left: var(--sidebar-collapsed);
+        }
+
+        /* Header */
+        .main-header {
+            height: var(--header-height);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 16px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .user-profile:hover {
+            background: #e2e8f0;
+        }
+
+        /* Content Area */
+        .content-wrapper {
+            padding: 30px;
+            min-height: calc(100vh - var(--header-height));
+        }
+
+        /* Section Header */
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        /* Language Selection */
+        .language-selector {
+            margin-bottom: 25px;
+        }
+
+        .language-selector label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        .language-select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: white;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .language-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* Text Input */
+        .text-input-container {
+            margin-bottom: 25px;
+        }
+
+        .text-input-container label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            display: block;
+            font-size: 0.95rem;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 180px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1rem;
+            background: white;
+            color: var(--text-primary);
+            resize: vertical;
+            transition: all 0.2s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .char-count {
+            position: absolute;
+            bottom: 12px;
+            right: 16px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .btn-primary-custom {
+            background: linear-gradient(90deg, var(--mantra-color), #38bdf8);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
+            color: white;
+        }
+
+        .btn-secondary-custom {
+            background: white;
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary-custom:hover {
+            background: #f1f5f9;
+            border-color: var(--primary-color);
+        }
+
+        /* Results Container */
+        .results-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .results-container.active {
+            display: block;
+            animation: slideUp 0.4s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .results-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .results-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Simple Results Display */
+        .result-section {
+            margin-bottom: 25px;
+        }
+
+        .result-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .result-content {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+        }
+
+        /* Sanskrit Version Display */
+        .sanskrit-display {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 1.2rem;
+            color: var(--mantra-color);
+            font-weight: 600;
+            text-align: center;
+            padding: 20px;
+            background: #f0f9ff;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+
+        /* Word Table */
+        .word-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        .word-table th {
+            background: #f1f5f9;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .word-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        .word-table tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Processing Animation */
+        .processing-animation {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Examples Container */
+        .examples-container {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .examples-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+
+        .example-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .example-item:hover {
+            background: #f8fafc;
+            border-color: var(--primary-color);
+        }
+
+        .example-text {
+            font-style: italic;
+            color: var(--text-secondary);
+        }
+
+        .example-label {
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: var(--sidebar-collapsed);
+            }
+
+            .sidebar:not(.collapsed) {
+                width: var(--sidebar-width);
+            }
+
+            .main-content {
+                margin-left: var(--sidebar-collapsed);
+            }
+
+            .sidebar:not(.collapsed)~.main-content {
+                margin-left: var(--sidebar-width);
+            }
+
+            .content-wrapper {
+                padding: 20px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn-primary-custom, .btn-secondary-custom {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Parent Layout -->
+    <div class="layout-container">
+        <!-- Left Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="#" class="logo">
+                    <div class="logo-icon">
+                        <i class="bi bi-translate"></i>
+                    </div>
+                    <span class="logo-text">PolyGlot</span>
+                </a>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="http://localhost:8000/cultural_idiom_file" class="nav-link" data-page="idiom">
+                        <i class="bi bi-translate nav-icon"></i>
+                        <span class="nav-text">Cultural Idioms</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="http://localhost:8000/context_aware_file" class="nav-link">
+                        <i class="bi bi-text-paragraph nav-icon"></i>
+                        <span class="nav-text">Context-Aware</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="http://localhost:8000/" class="nav-link" data-page="code-mixed">
+                        <i class="bi bi-code-slash nav-icon"></i>
+                        <span class="nav-text">Code-Mixed</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="http://localhost:8000/ghar_ki_boli_wali_file" class="nav-link" data-page="ghar-ki-boli">
+                        <i class="bi bi-house-door nav-icon"></i>
+                        <span class="nav-text">Ghar Ki Boli</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="http://localhost:8000/_arth_engine" class="nav-link active" data-page="ghar-ki-boli">
+                        <i class="bi bi-gear nav-icon"></i>
+                        <span class="nav-text">Arth Engine</span>
+                    </a>
+                </li>
+            </ul>
+
+            <button class="sidebar-toggle" id="sidebarToggle">
+                <i class="bi bi-chevron-left" id="toggleIcon"></i>
+            </button>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="main-header">
+                <h1 class="page-title" id="pageTitle">Mantra Arth</h1>
+                <div class="user-profile">
+                    <span>Welcome, User</span>
+                    <i class="bi bi-person-circle" style="font-size: 1.5rem;"></i>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="content-wrapper" id="pageContent">
+                <!-- Section Header -->
+                <div class="section-header">
+                    <div class="section-title">
+                        <div class="section-icon">
+                            <i class="bi bi-stars"></i>
+                        </div>
+                        <div>
+                            <h2>Mantra Interpretation</h2>
+                            <p class="text-muted mb-0">Deep understanding of Sanskrit mantras with spiritual insights</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Language Selection -->
+                <div class="language-selector">
+                    <label for="mantraTargetLang">
+                        <i class="bi bi-translate me-1"></i>
+                        Select Explanation Language
+                    </label>
+                    <select class="language-select" id="mantraTargetLang">
+                        <option value="hi" selected>Hindi (हिंदी)</option>
+                        <option value="en">English</option>
+                        <option value="gu">Gujarati (ગુજરાતી)</option>
+                        <option value="pa">Punjabi (ਪੰਜਾਬੀ)</option>
+                        <option value="mr">Marathi (मराठी)</option>
+                        <option value="bn">Bengali (বাংলা)</option>
+                    </select>
+                </div>
+
+                <!-- Text Input -->
+                <div class="text-input-container">
+                    <label for="mantraInputText">
+                        <i class="bi bi-stars me-1"></i>
+                        Enter Mantra (मंत्र)
+                    </label>
+                    <div style="position: relative;">
+                        <textarea class="text-input" id="mantraInputText" placeholder="Type or paste your sanskrit mantra : 'ॐ सर्वे भवन्तु सुखिनः'" rows="6"></textarea>
+                        <span class="char-count" id="mantraCharCount">0/2000</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-primary-custom" id="analyzeMantraBtn">
+                        <i class="bi bi-stars"></i>
+                        Analyze Mantra
+                    </button>
+                    <button class="btn btn-secondary-custom" id="clearMantraBtn">
+                        <i class="bi bi-x-circle"></i>
+                        Clear
+                    </button>
+                    <button class="btn btn-secondary-custom" id="mantraExampleBtn">
+                        <i class="bi bi-lightbulb"></i>
+                        Load Example
+                    </button>
+                </div>
+
+                <!-- Examples -->
+                <div class="examples-container">
+                    <div class="examples-title">
+                        <i class="bi bi-lightbulb"></i>
+                        Try These Mantra Examples
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <div class="example-item" data-example="mantra1">
+                                <div class="example-label">Gayatri Mantra</div>
+                                <div class="example-text">"ॐ भूर्भुवः स्वः तत्सवितुर्वरेण्यं भर्गो देवस्य धीमहि धियो यो नः प्रचोदयात्"</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            <div class="example-item" data-example="mantra2">
+                                <div class="example-label">Shanti Mantra</div>
+                                <div class="example-text">"ॐ सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः। सर्वे भद्राणि पश्यन्तु मा कश्चिद्दुःखभाग्भवेत्॥"</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Container -->
+                <div class="results-container" id="mantraResults">
+                    <div class="results-header">
+                        <div class="results-title">
+                            <i class="bi bi-stars text-blue"></i>
+                            Mantra Analysis Results
+                        </div>
+                        <div class="badge bg-blue">
+                            Complete Analysis
+                        </div>
+                    </div>
+
+                    <!-- Sanskrit Version -->
+                    <div class="result-section">
+                        <div class="result-label">
+                            <i class="bi bi-text-left"></i>
+                            Clean Sanskrit Version
+                        </div>
+                        <div class="sanskrit-display" id="cleanSanskrit"></div>
+                    </div>
+
+                    <!-- Word-by-Word Meaning -->
+                    <div class="result-section">
+                        <div class="result-label">
+                            <i class="bi bi-card-checklist"></i>
+                            Word-by-Word Meaning
+                        </div>
+                        <div class="result-content">
+                            <table class="word-table" id="wordMeaningTable">
+                                <thead>
+                                    <tr>
+                                        <th>Sanskrit Word</th>
+                                        <th>Meaning</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="wordMeaningBody">
+                                    <!-- Will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Full Explanation -->
+                    <div class="result-section">
+                        <div class="result-label">
+                            <i class="bi bi-chat-heart"></i>
+                            Full Heartfelt Explanation
+                        </div>
+                        <div class="result-content" id="fullExplanation"></div>
+                    </div>
+
+                    <!-- Benefits & Significance -->
+                    <div class="result-section">
+                        <div class="result-label">
+                            <i class="bi bi-gift"></i>
+                            Daily Life Benefits & Spiritual Significance
+                        </div>
+                        <div class="result-content" id="benefitsContent"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Sidebar Toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            const sidebar = document.getElementById('sidebar');
+            const toggleIcon = document.getElementById('toggleIcon');
+            sidebar.classList.toggle('collapsed');
+            toggleIcon.classList.toggle('bi-chevron-left');
+            toggleIcon.classList.toggle('bi-chevron-right');
+        });
+
+        // Initialize character counts
+        function initCharCounts() {
+            const textArea = document.getElementById('mantraInputText');
+            const countElement = document.getElementById('mantraCharCount');
+            
+            updateCharCount('mantraInputText', 'mantraCharCount', 2000);
+            textArea.addEventListener('input', () => {
+                updateCharCount('mantraInputText', 'mantraCharCount', 2000);
+            });
+        }
+
+        // Update character count
+        function updateCharCount(textAreaId, countElementId, maxChars = 2000) {
+            const textArea = document.getElementById(textAreaId);
+            const countElement = document.getElementById(countElementId);
+            const currentChars = textArea.value.length;
+
+            countElement.textContent = `${currentChars}/${maxChars}`;
+
+            if (currentChars > maxChars * 0.9) {
+                countElement.style.color = '#ef4444';
+            } else if (currentChars > maxChars * 0.7) {
+                countElement.style.color = '#f59e0b';
+            } else {
+                countElement.style.color = '#64748b';
+            }
+        }
+
+        // Show processing spinner
+        function showProcessingSpinner(containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `
+                <div class="processing-animation">
+                    <div class="spinner"></div>
+                    <div>Analyzing and interpreting mantra...</div>
+                    <small class="text-muted">This may take a few moments</small>
+                </div>
+            `;
+            container.classList.add('active');
+        }
+
+        // Example click handlers
+        const examples = {
+            'mantra1': {
+                text: "ॐ भूर्भुवः स्वः तत्सवितुर्वरेण्यं भर्गो देवस्य धीमहि धियो यो नः प्रचोदयात्",
+                desc: "Gayatri Mantra"
+            },
+            'mantra2': {
+                text: "ॐ सर्वे भवन्तु सुखिनः सर्वे सन्तु निरामयाः।\nसर्वे भद्राणि पश्यन्तु मा कश्चिद्दुःखभाग्भवेत्॥",
+                desc: "Shanti Mantra"
+            }
+        };
+
+        document.querySelectorAll('.example-item').forEach(item => {
+            item.addEventListener('click', function () {
+                const exampleKey = this.getAttribute('data-example');
+                const example = examples[exampleKey];
+                
+                if (example) {
+                    document.getElementById('mantraInputText').value = example.text;
+                    updateCharCount('mantraInputText', 'mantraCharCount', 2000);
+                    showToast(`${example.desc} loaded`, 'info');
+                }
+            });
+        });
+
+        // Analyze Mantra Button
+        document.getElementById('analyzeMantraBtn').addEventListener('click', async function () {
+            const mantraText = document.getElementById('mantraInputText').value.trim();
+            const targetLang = document.getElementById('mantraTargetLang').value;
+            
+            if (!mantraText) {
+                showToast('Please enter a mantra to analyze', 'warning');
+                return;
+            }
+            
+            // Show processing
+            showProcessingSpinner('mantraResults');
+            
+            const btn = this;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Analyzing...';
+            btn.disabled = true;
+            
+            try {
+                // Call backend API for Mantra analysis
+                const response = await fetch('http://localhost:8000/analyze_mantra', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        inputText : mantraText,
+                        targetLang : targetLang,
+                        inputLang : "sanskrit",
+                        targetRegion : "india"
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                // Update UI with results
+                updateMantraResults(result);
+                showToast('Mantra analysis complete!', 'success');
+                
+            } catch (error) {
+                console.error('Analysis error:', error);
+                showToast('Error analyzing mantra', 'error');
+                
+                // Show fallback results for demo
+                showFallbackMantraResults(mantraText, targetLang);
+            } finally {
+                // Restore button
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+            }
+        });
+
+        // Update Mantra Results
+        function updateMantraResults(result) {
+            const resultsContainer = document.getElementById('mantraResults');
+            
+            // Show results container
+            resultsContainer.innerHTML = ''; // Remove spinner
+            
+            let wordTableHTML = '';
+            if (result.word_meanings && result.word_meanings.length > 0) {
+                wordTableHTML = result.word_meanings.map(word => `
+                    <tr>
+                        <td><strong>${word.sanskrit || ''}</strong></td>
+                        <td>${word.meaning || ''}</td>
+                    </tr>
+                `).join('');
+            } else {
+                wordTableHTML = '<tr><td colspan="2" class="text-center">No word meanings available</td></tr>';
+            }
+            
+            resultsContainer.innerHTML = `
+                <div class="results-header">
+                    <div class="results-title">
+                        <i class="bi bi-stars text-blue"></i>
+                        Mantra Analysis Results
+                    </div>
+                    <div class="badge bg-blue">
+                        Complete Analysis
+                    </div>
+                </div>
+                <div class="result-section">
+                    <div class="result-label">
+                        <i class="bi bi-text-left"></i>
+                        Clean Sanskrit Version
+                    </div>
+                    <div class="sanskrit-display">${result.clean_sanskrit || 'Not available'}</div>
+                </div>
+                <div class="result-section">
+                    <div class="result-label">
+                        <i class="bi bi-card-checklist"></i>
+                        Word-by-Word Meaning
+                    </div>
+                    <div class="result-content">
+                        <table class="word-table">
+                            <thead>
+                                <tr>
+                                    <th>Sanskrit Word</th>
+                                    <th>Meaning</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${wordTableHTML}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="result-section">
+                    <div class="result-label">
+                        <i class="bi bi-chat-heart"></i>
+                        Full Heartfelt Explanation
+                    </div>
+                    <div class="result-content">${result.full_explanation || 'Not available'}</div>
+                </div>
+                <div class="result-section">
+                    <div class="result-label">
+                        <i class="bi bi-gift"></i>
+                        Daily Life Benefits & Spiritual Significance
+                    </div>
+                    <div class="result-content">${result.benefits_content || 'Not available'}</div>
+                </div>
+            `;
+            resultsContainer.classList.add('active');
+        }
+
+        // Fallback results for demo
+        function showFallbackMantraResults(mantraText, targetLang) {
+            const result = {
+                clean_sanskrit: mantraText,
+                word_meanings: [
+                    { sanskrit: "ॐ", meaning: "The primordial sound, representing the universe" },
+                    { sanskrit: "सर्वे", meaning: "All, everyone" },
+                    { sanskrit: "भवन्तु", meaning: "May be, become" },
+                    { sanskrit: "सुखिनः", meaning: "Happy, joyful" }
+                ],
+                full_explanation: "This mantra is a prayer for universal peace and happiness. It wishes that all beings may be happy, healthy, and free from suffering. The mantra invokes divine blessings for the well-being of all creation.",
+                benefits_content: "Reciting this mantra daily: 1. Promotes inner peace and calmness 2. Enhances concentration and mental clarity 3. Creates positive vibrations in surroundings 4. Helps in stress reduction and anxiety relief 5. Connects individual consciousness with universal consciousness 6. Brings spiritual growth and enlightenment"
+            };
+            
+            updateMantraResults(result);
+        }
+
+        // Clear button
+        document.getElementById('clearMantraBtn').addEventListener('click', function () {
+            document.getElementById('mantraInputText').value = '';
+            updateCharCount('mantraInputText', 'mantraCharCount', 2000);
+            document.getElementById('mantraResults').classList.remove('active');
+            showToast('Cleared mantra input', 'info');
+        });
+
+        // Example button
+        document.getElementById('mantraExampleBtn').addEventListener('click', function () {
+            document.getElementById('mantraInputText').value = examples['mantra1'].text;
+            updateCharCount('mantraInputText', 'mantraCharCount', 2000);
+            showToast('Example mantra loaded', 'info');
+        });
+
+        // Toast notification
+        function showToast(message, type = 'info') {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="bi ${type === 'success' ? 'bi-check-circle' : type === 'error' ? 'bi-x-circle' : type === 'warning' ? 'bi-exclamation-triangle' : 'bi-info-circle'} me-2"></i>
+                    ${message}
+                </div>
+            `;
+
+            // Add styles
+            toast.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 30px;
+                background: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : type === 'warning' ? '#f59e0b' : '#3b82f6'};
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+            `;
+
+            document.body.appendChild(toast);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
+
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            .text-blue { color: #0ea5e9 !important; }
+            .bg-blue { background-color: #0ea5e9 !important; }
+        `;
+        document.head.appendChild(style);
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function () {
+            initCharCounts();
+        });
+    </script>
+</body>
+
+</html>
