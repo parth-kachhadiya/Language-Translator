@@ -2,6 +2,12 @@
 
 ### **🤖 Meaning-Centric AI Translation for indian languages. 🤖**
 
+- **Library installation command**
+  - **`pip install fastapi uvicorn python-dotenv langchain-google-genai langchain-core`**
+
+- **Command to run code.**
+  - **`uvicorn main:app --reload`**
+
 ---
 
 ## **📌 Overview**
